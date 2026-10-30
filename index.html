@@ -451,17 +451,11 @@ h1.glitch span:first-child{animation:glJ 3.4s infinite steps(1)}
 .setup .stepper button{height:var(--btn-step);font-size:22px}
 .setup .stepper .num{font-size:var(--fs-count)}
 .setup .choice strong{font-size:var(--fs-section)}
-body:has(.wrap.home){min-height:0}
-/* escolha de modo, celular: título no alto, cartões ocupam o resto da altura (100dvh) */
-.wrap.home{min-height:calc(100vh - 114px);min-height:calc(100dvh - 114px)}
-.wrap.home .stack{flex:1;gap:20px}
-.wrap.home .choice{flex:1;min-height:120px;padding:22px;justify-content:center}
-/* tablet e computador: coluna de ~720px centralizada, cartões lado a lado e do mesmo tamanho */
+/* escolha de modo: cartões compactos logo abaixo do título (lado a lado em tablet e computador) */
 @media (min-width:700px){
   .wrap.setup{max-width:720px}
-  .wrap.home{justify-content:center;gap:56px}
-  .wrap.home .stack{flex:none;flex-direction:row;gap:24px}
-  .wrap.home .choice{min-height:clamp(170px,22dvh,240px);padding:28px}
+  .wrap.home .stack{flex-direction:row;gap:16px}
+  .wrap.home .choice{flex:1}
 }
 @media (min-width:900px){
   /* coluna única centralizada, com espaços maiores */
@@ -472,8 +466,6 @@ body:has(.wrap.home){min-height:0}
   .wrap.setup .names{gap:14px}
   .wrap.setup input[type=text]{min-height:52px;padding:12px 14px}
   .wrap.setup .toggle{padding:18px}
-  .wrap.home{min-height:calc(100vh - 142px);min-height:calc(100dvh - 142px)}
-  .wrap.home .stack{gap:28px}
 }
 
 /* cenas 2 a 5: fundo com a mesma cidade do vídeo, em cores diferentes */
@@ -617,22 +609,31 @@ body:has(.wrap.home){min-height:0}
 @keyframes vGl{0%,70%,100%{transform:none;clip-path:inset(0)}72%{transform:translateX(-5px);clip-path:inset(12% 0 58% 0)}74%{transform:translateX(6px);clip-path:inset(55% 0 12% 0)}76%{transform:translateX(-3px);clip-path:inset(30% 0 40% 0);filter:grayscale(1) contrast(1.6) brightness(1.2)}78%{transform:none;clip-path:inset(0)}90%{transform:translateX(3px)}91%{transform:none}}
 @media (prefers-reduced-motion:reduce){.scard .svid{animation:none}}
 /* tela de abertura */
-.splash{min-height:calc(100svh - 90px);display:flex;flex-direction:column;justify-content:center;gap:16px;position:relative;overflow:hidden;padding:24px 0}
-.spl-rings{position:absolute;left:50%;top:34%;width:0;height:0;pointer-events:none}
-.spl-rings i{position:absolute;left:-150px;top:-150px;width:300px;height:300px;border-radius:50%;border:1.5px solid var(--res);opacity:0;animation:splRing 3.6s ease-out infinite}
+.splash{min-height:calc(100vh - 114px);min-height:calc(100dvh - 114px);width:100%;max-width:640px;margin-inline:auto;container-type:inline-size;display:flex;flex-direction:column;justify-content:space-between;gap:20px;position:relative;overflow:hidden;text-align:center}
+body:has(.splash){min-height:0}
+.spl-head{--H:clamp(220px,34dvh,340px);position:relative;flex:none;height:var(--H);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.spl-rings{position:absolute;left:50%;top:50%;width:0;height:0;pointer-events:none}
+.spl-rings i{--d:calc(var(--H)/1.6);position:absolute;left:calc(var(--d)/-2);top:calc(var(--d)/-2);width:var(--d);height:var(--d);border-radius:50%;border:1.5px solid var(--res);opacity:0;animation:splRing 3.6s ease-out infinite}
 .spl-rings i:nth-child(2){animation-delay:1.2s}.spl-rings i:nth-child(3){animation-delay:2.4s}
 @keyframes splRing{0%{transform:scale(.1);opacity:.7}100%{transform:scale(1.6);opacity:0}}
-.spl-kick{position:relative;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);animation:stIn .8s both}
-.spl-title{position:relative;font-family:var(--f-disp);font-weight:400;font-size:clamp(24px,9vw,44px);line-height:1.1;letter-spacing:.02em;text-transform:uppercase;word-break:keep-all;overflow-wrap:normal;text-shadow:0 0 24px rgba(53,212,234,.4);animation:splOn 1.1s linear both,splGl 4.5s steps(1) 1.4s infinite}
+.spl-kick{position:relative;font-size:clamp(11px,.3vw + 10px,14px);letter-spacing:.22em;text-transform:uppercase;color:var(--dim);animation:stIn .8s both}
+.spl-title{position:relative;font-family:var(--f-disp);font-weight:400;font-size:clamp(28px,11cqw,72px);line-height:1.1;letter-spacing:.02em;text-transform:uppercase;word-break:keep-all;overflow-wrap:normal;text-shadow:0 0 24px rgba(53,212,234,.4);animation:splOn 1.1s linear both,splGl 4.5s steps(1) 1.4s infinite}
 @keyframes splOn{0%{opacity:0;transform:scaleY(.02);filter:brightness(6)}25%{opacity:1;transform:scaleY(.02)}55%{transform:scaleY(1);filter:brightness(2.2)}65%{filter:brightness(.4)}80%{filter:brightness(1.6)}100%{opacity:1;transform:none;filter:none}}
 @keyframes splGl{0%,88%,100%{transform:none;text-shadow:0 0 24px rgba(53,212,234,.4)}90%{transform:translateX(-4px);text-shadow:3px 0 var(--spy),-3px 0 var(--res)}92%{transform:translateX(5px);text-shadow:-3px 0 var(--spy),3px 0 var(--res)}94%{transform:none}}
-.spl-log{position:relative;display:flex;flex-direction:column;gap:8px;color:var(--dim);font-size:14px;line-height:1.4;min-height:130px}
+.spl-log{position:relative;display:flex;flex-direction:column;gap:8px;color:var(--dim);font-size:clamp(14px,.4vw + 12.5px,17px);line-height:1.4;min-height:130px;flex:1;justify-content:center}
 .spl-log p{margin:0;opacity:0;animation:stIn .5s ease-out both;animation-delay:calc(.5s + var(--i)*.6s)}
 .spl-log p::before{content:"> ";color:var(--res)}
 .spl-bar{position:relative;height:3px;background:var(--line);border-radius:2px;overflow:hidden}
 .spl-bar span{position:absolute;inset:0;background:var(--res);box-shadow:0 0 10px var(--res);transform-origin:left;animation:splBar 3s cubic-bezier(.3,.6,.4,1) both}
 @keyframes splBar{0%{transform:scaleX(0)}100%{transform:scaleX(1)}}
 .spl-go{position:relative;opacity:0;animation:stIn .6s ease-out 3s both}
+@media (min-width:700px){
+  .splash{justify-content:center;gap:28px}
+  .spl-head{--H:clamp(280px,42dvh,420px)}
+  .spl-log{flex:none}
+  .spl-go{align-self:center;width:100%;max-width:360px}
+}
+@media (min-width:900px){.splash{min-height:calc(100vh - 142px);min-height:calc(100dvh - 142px)}}
 @media (prefers-reduced-motion:reduce){.spl-rings i,.spl-title{animation:none}.spl-title{opacity:1}}
 
 /* telas se ligando ao abrir a escolha de história */
@@ -839,8 +840,8 @@ function useStory(i){
 function splashView(){
   var L=['Conectando à frequência oculta…','A Central controla toda a comunicação da cidade.','Resta uma frequência que ela ainda não encontrou.','Cada partida é um episódio desta história.'];
   var lg='';for(var i=0;i<L.length;i++)lg+='<p style="--i:'+i+'">'+L[i]+'</p>';
-  return '<section class="splash"><div class="spl-rings" aria-hidden="true"><i></i><i></i><i></i></div>'
-   +'<p class="spl-kick">Transmissão interceptada</p><h1 class="spl-title">Sinal Fantasma</h1>'
+  return '<section class="splash"><div class="spl-head"><div class="spl-rings" aria-hidden="true"><i></i><i></i><i></i></div>'
+   +'<p class="spl-kick">Transmissão interceptada</p><h1 class="spl-title">Sinal Fantasma</h1></div>'
    +'<div class="spl-log">'+lg+'</div>'
    +'<div class="spl-bar" aria-hidden="true"><span></span></div>'
    +'<button class="btn primary spl-go" data-a="splashGo">Entrar no sinal</button></section>';
