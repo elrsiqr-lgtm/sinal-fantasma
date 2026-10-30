@@ -431,42 +431,48 @@ h1.glitch span:first-child{animation:glJ 3.4s infinite steps(1)}
 .hero h1.glitch span{white-space:nowrap}
 
 /* ===== telas de início (escolha de modo, No mesmo aparelho, Online local): escala tipográfica e layout =====
-   Escala: título do jogo > título de seção > texto de apoio > rótulo/campo. O número de jogadores segue grande. */
+   Escala: título do jogo (único elemento grande) > número de jogadores (destaque médio) > título de seção > texto de apoio > rótulo > campo. */
 :root{
   --fs-title:clamp(28px,11.6cqw,84px);
-  --fs-section:clamp(15px,.45vw + 12.5px,19px);
-  --fs-body:clamp(14px,.3vw + 12.5px,16.5px);
-  --fs-label:clamp(12px,.2vw + 10.5px,14px);
-  --fs-count:clamp(44px,2vw + 36px,60px);
+  --fs-count:clamp(40px,1vw + 36px,48px);
+  --fs-section:clamp(14px,.1vw + 13.6px,15.5px);
+  --fs-body:clamp(13px,.2vw + 12.2px,15px);
+  --fs-label:clamp(12px,.1vw + 11.6px,13px);
+  --fs-field:clamp(13px,.1vw + 12.6px,14px);
+  --btn-step:50px;
 }
 .setup .hero h1.glitch{font-size:var(--fs-title)}
 .setup .eyebrow{font-size:var(--fs-section)}
-.setup .lead,.setup .warn,.setup .split,.setup .toggle strong,.setup .toggle small,.setup .choice small{font-size:var(--fs-body)}
-.setup .fieldlab,.setup .or,.setup .skip,.setup .names label,.setup input[type=text]{font-size:var(--fs-label)}
+.setup .lead,.setup .warn,.setup .toggle strong,.setup .toggle small,.setup .choice small{font-size:var(--fs-body)}
+.setup .split,.setup .fieldlab,.setup .or,.setup .skip,.setup .names label{font-size:var(--fs-label)}
+.setup input[type=text]{font-size:var(--fs-field)}
 .setup .ocodeinput{font-size:20px}
+.setup .stepper{grid-template-columns:var(--btn-step) 1fr var(--btn-step)}
+.setup .stepper button{height:var(--btn-step);font-size:22px}
 .setup .stepper .num{font-size:var(--fs-count)}
 .setup .choice strong{font-size:var(--fs-section)}
 body:has(.wrap.home){min-height:0}
-.wrap.home{min-height:calc(100vh - 114px);min-height:calc(100dvh - 114px);justify-content:space-between}
-.wrap.home .stack{gap:20px}
-.wrap.home .choice{min-height:clamp(120px,19dvh,190px);padding:22px;justify-content:center}
+/* escolha de modo, celular: título no alto, cartões ocupam o resto da altura (100dvh) */
+.wrap.home{min-height:calc(100vh - 114px);min-height:calc(100dvh - 114px)}
+.wrap.home .stack{flex:1;gap:20px}
+.wrap.home .choice{flex:1;min-height:120px;padding:22px;justify-content:center}
+/* tablet e computador: coluna de ~720px centralizada, cartões lado a lado e do mesmo tamanho */
 @media (min-width:700px){
   .wrap.setup{max-width:720px}
-  .wrap.home .stack{flex-direction:row;gap:24px}
-  .wrap.home .choice{flex:1;min-height:clamp(170px,22dvh,240px);padding:28px}
+  .wrap.home{justify-content:center;gap:56px}
+  .wrap.home .stack{flex:none;flex-direction:row;gap:24px}
+  .wrap.home .choice{min-height:clamp(170px,22dvh,240px);padding:28px}
 }
 @media (min-width:900px){
-  /* coluna única centralizada, com fontes e espaços maiores */
+  /* coluna única centralizada, com espaços maiores */
   .wrap.setup{display:flex;flex-direction:column;align-items:stretch;gap:32px;max-width:720px}
   .wrap.setup>*{margin-bottom:0}
   .wrap.setup>.hero{position:static;top:auto;align-self:stretch}
   .wrap.setup .stack{gap:14px}
   .wrap.setup .names{gap:14px}
   .wrap.setup input[type=text]{min-height:52px;padding:12px 14px}
-  .wrap.setup .stepper{grid-template-columns:68px 1fr 68px;gap:14px}
-  .wrap.setup .stepper button{height:68px}
   .wrap.setup .toggle{padding:18px}
-  .wrap.home{min-height:calc(100vh - 142px);min-height:calc(100dvh - 142px);justify-content:center;gap:56px}
+  .wrap.home{min-height:calc(100vh - 142px);min-height:calc(100dvh - 142px)}
   .wrap.home .stack{gap:28px}
 }
 
