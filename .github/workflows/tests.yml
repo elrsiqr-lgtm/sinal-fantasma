@@ -1,0 +1,26 @@
+name: Testes
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  testes:
+    name: testes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Jogo (partidas locais e online)
+        run: |
+          set -o pipefail
+          node tests/harness.js index.html | tee harness.log
+          grep -q "TUDO OK" harness.log
+      - name: Adaptador do Supabase
+        run: |
+          set -o pipefail
+          node tests/adapter-test.js index.html | tee adapter.log
+          grep -q "ADAPTADOR OK" adapter.log

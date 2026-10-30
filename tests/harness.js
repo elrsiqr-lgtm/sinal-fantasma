@@ -249,7 +249,13 @@ let dbRef=null;
     // tutorial na primeira visita
     assert(/Como jogar/.test(c.html()),'tutorial aparece na primeira visita');
     await click(c,'tourSkip');
-    assert(btn(c,'start')===true,'tela inicial');
+    assert(btn(c,'setMode','local')!==null&&btn(c,'setMode','online')!==null,'tela inicial com as duas escolhas');
+    assert(btn(c,'start')===null&&!/class="tabs"/.test(c.html()),'tela inicial sem abas nem configuração');
+    await click(c,'setMode',{v:'local'});
+    assert(btn(c,'goHome')!==null,'botão Voltar no modo local');
+    await click(c,'goHome');assert(btn(c,'setMode','local')!==null,'Voltar leva à escolha');
+    await click(c,'setMode',{v:'local'});
+    assert(btn(c,'start')===true,'tela do modo local');
     while(+c.html().match(/<div class="num"[^>]*>(\d+)/)[1]<n)await click(c,'inc');
     if(n===5)c.el.listeners.change({target:{id:'assassin',checked:true}});
     await click(c,'start');await click(c,'storyGo');

@@ -213,6 +213,8 @@ input[type=text]:focus{border-color:var(--res);outline:none}
 .tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;border:1px solid var(--line);border-radius:12px;background:var(--deck)}
 .tab{min-height:44px;border-radius:8px;font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
 .tab.on{background:var(--panel);color:var(--text);box-shadow:inset 0 0 0 1.5px var(--res)}
+.choice{flex-direction:column;align-items:flex-start;gap:6px;min-height:96px;text-align:left}
+.choice small{font-size:13px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--dim)}
 .obar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .ocode{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
 .ocode b{color:var(--text);font-family:var(--f-disp);font-weight:400;letter-spacing:.14em}
@@ -428,6 +430,44 @@ h1.glitch span:first-child{animation:glJ 3.4s infinite steps(1)}
 .hero h1.glitch{font-size:clamp(24px,10cqw,62px);overflow-wrap:normal;word-break:normal}
 .hero h1.glitch span{white-space:nowrap}
 
+/* ===== telas de início (escolha de modo, No mesmo aparelho, Online local): escala tipográfica e layout =====
+   Escala: título do jogo (único elemento grande) > número de jogadores (destaque médio) > título de seção > texto de apoio > rótulo > campo. */
+:root{
+  --fs-title:clamp(28px,11.6cqw,84px);
+  --fs-count:clamp(40px,1vw + 36px,48px);
+  --fs-section:clamp(14px,.1vw + 13.6px,15.5px);
+  --fs-body:clamp(13px,.2vw + 12.2px,15px);
+  --fs-label:clamp(12px,.1vw + 11.6px,13px);
+  --fs-field:clamp(13px,.1vw + 12.6px,14px);
+  --btn-step:50px;
+}
+.setup .hero h1.glitch{font-size:var(--fs-title)}
+.setup .eyebrow{font-size:var(--fs-section)}
+.setup .lead,.setup .warn,.setup .toggle strong,.setup .toggle small,.setup .choice small{font-size:var(--fs-body)}
+.setup .split,.setup .fieldlab,.setup .or,.setup .skip,.setup .names label{font-size:var(--fs-label)}
+.setup input[type=text]{font-size:var(--fs-field)}
+.setup .ocodeinput{font-size:20px}
+.setup .stepper{grid-template-columns:var(--btn-step) 1fr var(--btn-step)}
+.setup .stepper button{height:var(--btn-step);font-size:22px}
+.setup .stepper .num{font-size:var(--fs-count)}
+.setup .choice strong{font-size:var(--fs-section)}
+/* escolha de modo: cartões compactos logo abaixo do título (lado a lado em tablet e computador) */
+@media (min-width:700px){
+  .wrap.setup{max-width:720px}
+  .wrap.home .stack{flex-direction:row;gap:16px}
+  .wrap.home .choice{flex:1}
+}
+@media (min-width:900px){
+  /* coluna única centralizada, com espaços maiores */
+  .wrap.setup{display:flex;flex-direction:column;align-items:stretch;gap:32px;max-width:720px}
+  .wrap.setup>*{margin-bottom:0}
+  .wrap.setup>.hero{position:static;top:auto;align-self:stretch}
+  .wrap.setup .stack{gap:14px}
+  .wrap.setup .names{gap:14px}
+  .wrap.setup input[type=text]{min-height:52px;padding:12px 14px}
+  .wrap.setup .toggle{padding:18px}
+}
+
 /* cenas 2 a 5: fundo com a mesma cidade do vídeo, em cores diferentes */
 .scene>*{position:relative;z-index:1}
 .scene>.vid,.scene>.sky,.scene>.pulse,.scene>.beam{position:absolute;z-index:0}
@@ -569,22 +609,31 @@ h1.glitch span:first-child{animation:glJ 3.4s infinite steps(1)}
 @keyframes vGl{0%,70%,100%{transform:none;clip-path:inset(0)}72%{transform:translateX(-5px);clip-path:inset(12% 0 58% 0)}74%{transform:translateX(6px);clip-path:inset(55% 0 12% 0)}76%{transform:translateX(-3px);clip-path:inset(30% 0 40% 0);filter:grayscale(1) contrast(1.6) brightness(1.2)}78%{transform:none;clip-path:inset(0)}90%{transform:translateX(3px)}91%{transform:none}}
 @media (prefers-reduced-motion:reduce){.scard .svid{animation:none}}
 /* tela de abertura */
-.splash{min-height:calc(100svh - 90px);display:flex;flex-direction:column;justify-content:center;gap:16px;position:relative;overflow:hidden;padding:24px 0}
-.spl-rings{position:absolute;left:50%;top:34%;width:0;height:0;pointer-events:none}
-.spl-rings i{position:absolute;left:-150px;top:-150px;width:300px;height:300px;border-radius:50%;border:1.5px solid var(--res);opacity:0;animation:splRing 3.6s ease-out infinite}
+.splash{min-height:calc(100vh - 114px);min-height:calc(100dvh - 114px);width:100%;max-width:640px;margin-inline:auto;container-type:inline-size;display:flex;flex-direction:column;justify-content:space-between;gap:20px;position:relative;overflow:hidden;text-align:center}
+body:has(.splash){min-height:0}
+.spl-head{--H:clamp(220px,34dvh,340px);position:relative;flex:none;height:var(--H);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.spl-rings{position:absolute;left:50%;top:50%;width:0;height:0;pointer-events:none}
+.spl-rings i{--d:calc(var(--H)/1.6);position:absolute;left:calc(var(--d)/-2);top:calc(var(--d)/-2);width:var(--d);height:var(--d);border-radius:50%;border:1.5px solid var(--res);opacity:0;animation:splRing 3.6s ease-out infinite}
 .spl-rings i:nth-child(2){animation-delay:1.2s}.spl-rings i:nth-child(3){animation-delay:2.4s}
 @keyframes splRing{0%{transform:scale(.1);opacity:.7}100%{transform:scale(1.6);opacity:0}}
-.spl-kick{position:relative;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);animation:stIn .8s both}
-.spl-title{position:relative;font-family:var(--f-disp);font-weight:400;font-size:clamp(24px,9vw,44px);line-height:1.1;letter-spacing:.02em;text-transform:uppercase;word-break:keep-all;overflow-wrap:normal;text-shadow:0 0 24px rgba(53,212,234,.4);animation:splOn 1.1s linear both,splGl 4.5s steps(1) 1.4s infinite}
+.spl-kick{position:relative;font-size:clamp(11px,.3vw + 10px,14px);letter-spacing:.22em;text-transform:uppercase;color:var(--dim);animation:stIn .8s both}
+.spl-title{position:relative;font-family:var(--f-disp);font-weight:400;font-size:clamp(28px,11cqw,72px);line-height:1.1;letter-spacing:.02em;text-transform:uppercase;word-break:keep-all;overflow-wrap:normal;text-shadow:0 0 24px rgba(53,212,234,.4);animation:splOn 1.1s linear both,splGl 4.5s steps(1) 1.4s infinite}
 @keyframes splOn{0%{opacity:0;transform:scaleY(.02);filter:brightness(6)}25%{opacity:1;transform:scaleY(.02)}55%{transform:scaleY(1);filter:brightness(2.2)}65%{filter:brightness(.4)}80%{filter:brightness(1.6)}100%{opacity:1;transform:none;filter:none}}
 @keyframes splGl{0%,88%,100%{transform:none;text-shadow:0 0 24px rgba(53,212,234,.4)}90%{transform:translateX(-4px);text-shadow:3px 0 var(--spy),-3px 0 var(--res)}92%{transform:translateX(5px);text-shadow:-3px 0 var(--spy),3px 0 var(--res)}94%{transform:none}}
-.spl-log{position:relative;display:flex;flex-direction:column;gap:8px;color:var(--dim);font-size:14px;line-height:1.4;min-height:130px}
+.spl-log{position:relative;display:flex;flex-direction:column;gap:8px;color:var(--dim);font-size:clamp(14px,.4vw + 12.5px,17px);line-height:1.4;min-height:130px;flex:1;justify-content:center}
 .spl-log p{margin:0;opacity:0;animation:stIn .5s ease-out both;animation-delay:calc(.5s + var(--i)*.6s)}
 .spl-log p::before{content:"> ";color:var(--res)}
 .spl-bar{position:relative;height:3px;background:var(--line);border-radius:2px;overflow:hidden}
 .spl-bar span{position:absolute;inset:0;background:var(--res);box-shadow:0 0 10px var(--res);transform-origin:left;animation:splBar 3s cubic-bezier(.3,.6,.4,1) both}
 @keyframes splBar{0%{transform:scaleX(0)}100%{transform:scaleX(1)}}
 .spl-go{position:relative;opacity:0;animation:stIn .6s ease-out 3s both}
+@media (min-width:700px){
+  .splash{justify-content:center;gap:28px}
+  .spl-head{--H:clamp(280px,42dvh,420px)}
+  .spl-log{flex:none}
+  .spl-go{align-self:center;width:100%;max-width:360px}
+}
+@media (min-width:900px){.splash{min-height:calc(100vh - 142px);min-height:calc(100dvh - 142px)}}
 @media (prefers-reduced-motion:reduce){.spl-rings i,.spl-title{animation:none}.spl-title{opacity:1}}
 
 /* telas se ligando ao abrir a escolha de história */
@@ -791,8 +840,8 @@ function useStory(i){
 function splashView(){
   var L=['Conectando à frequência oculta…','A Central controla toda a comunicação da cidade.','Resta uma frequência que ela ainda não encontrou.','Cada partida é um episódio desta história.'];
   var lg='';for(var i=0;i<L.length;i++)lg+='<p style="--i:'+i+'">'+L[i]+'</p>';
-  return '<section class="splash"><div class="spl-rings" aria-hidden="true"><i></i><i></i><i></i></div>'
-   +'<p class="spl-kick">Transmissão interceptada</p><h1 class="spl-title">Sinal Fantasma</h1>'
+  return '<section class="splash"><div class="spl-head"><div class="spl-rings" aria-hidden="true"><i></i><i></i><i></i></div>'
+   +'<p class="spl-kick">Transmissão interceptada</p><h1 class="spl-title">Sinal Fantasma</h1></div>'
    +'<div class="spl-log">'+lg+'</div>'
    +'<div class="spl-bar" aria-hidden="true"><span></span></div>'
    +'<button class="btn primary spl-go" data-a="splashGo">Entrar no sinal</button></section>';
@@ -856,10 +905,16 @@ function tourView(){
 }
 
 /* ---------- telas ---------- */
-function tabs(){
-  return '<div class="tabs" role="tablist" aria-label="Como jogar">'
-  +'<button class="tab'+(mode==='local'?' on':'')+'" role="tab" aria-selected="'+(mode==='local')+'" data-a="setMode" data-v="local">No mesmo aparelho</button>'
-  +'<button class="tab'+(mode==='online'?' on':'')+'" role="tab" aria-selected="'+(mode==='online')+'" data-a="setMode" data-v="online">Online local</button></div>';
+function backBar(){
+  return '<div class="tourbar"><p class="eyebrow">'+(mode==='online'?'Online local':'No mesmo aparelho')+'</p><button class="skip" data-a="goHome">Voltar</button></div>';
+}
+function homeView(){
+  return '<div class="wrap home setup">'
+  +'<header class="hero"><p class="eyebrow">Dedução social</p><h1 class="glitch"><span data-t="Sinal">Sinal</span><span data-t="Fantasma">Fantasma</span></h1></header>'
+  +'<section class="stack">'
+  +'<button class="btn choice" data-a="setMode" data-v="local"><strong>No mesmo aparelho</strong><small>Passe o celular de mão em mão.</small></button>'
+  +'<button class="btn choice" data-a="setMode" data-v="online"><strong>Online local</strong><small>Cada um joga no seu celular.</small></button>'
+  +'</section></div>';
 }
 function storyView(){
   return '<div class="wrap"><div class="tourbar"><p class="eyebrow">Antes de começar</p><button class="skip" data-a="storyBack">Voltar</button></div>'
@@ -880,17 +935,17 @@ function storyPicker(sel,act){
   });
   return h+'</div></section>';
 }
-function setupView(){return mode==='online'?onlineSetupView():localSetupView();}
+function setupView(){return home?homeView():mode==='online'?onlineSetupView():localSetupView();}
 function localSetupView(){
   var n=cfg.n,sp=SPIES[n];
   var inputs='';
   for(var i=0;i<n;i++){
     inputs+='<label for="nm'+i+'">Agente Rebelde '+(i+1)+'<input type="text" id="nm'+i+'" data-name="'+i+'" value="'+esc(cfg.names[i])+'" maxlength="18" autocomplete="off" placeholder="Codinome"></label>';
   }
-  return '<div class="wrap">'
+  return '<div class="wrap setup">'+backBar()
   +'<header class="hero"><p class="eyebrow">Dedução social</p><h1 class="glitch"><span data-t="Sinal">Sinal</span><span data-t="Fantasma">Fantasma</span></h1>'
   +'<p class="lead">Passe o celular de mão em mão. O jogo cuida dos papéis secretos, das votações e das cartas de missão.</p></header>'
-  +tabs()+'<section class="stack"><p class="eyebrow">Quantos vão jogar</p>'
+  +'<section class="stack"><p class="eyebrow">Quantos vão jogar</p>'
   +'<div class="stepper"><button id="dec" data-a="dec" aria-label="Um jogador a menos"'+(n<=5?' disabled':'')+'>−</button>'
   +'<div class="num" aria-live="polite">'+n+'</div>'
   +'<button id="inc" data-a="inc" aria-label="Um jogador a mais"'+(n>=10?' disabled':'')+'>+</button></div>'
@@ -1054,7 +1109,7 @@ function endView(){
 }
 
 /* ---------- online ---------- */
-var mode='local';
+var mode='local',home=true;
 var OL={status:'checking',db:null,user:null,id:null,name:'',code:'',msg:'',busy:false};
 var O=null;
 try{OL.name=localStorage.getItem('rd_name')||'';}catch(e){}
@@ -1462,10 +1517,10 @@ function onlineSetupView(){
     +'<button class="btn" data-a="joinOnline"'+dis+'>Entrar na partida</button>'
     +(OL.msg?'<p class="warn">'+esc(OL.msg)+'</p>':'');
   }
-  return '<div class="wrap">'
+  return '<div class="wrap setup">'+backBar()
   +'<header class="hero"><p class="eyebrow">Dedução social</p><h1 class="glitch"><span data-t="Sinal">Sinal</span><span data-t="Fantasma">Fantasma</span></h1>'
   +'<p class="lead">Cada um joga no seu celular. Um cria a partida e manda o código para os outros.</p></header>'
-  +tabs()+body+'<button class="btn" data-a="openTour">Ver como jogar</button></div>';
+  +body+'<button class="btn" data-a="openTour">Ver como jogar</button></div>';
 }
 function obar(){
   var g=O.game,playing=g&&g.phase!=='lobby'&&O.myRole&&O.myRole.gid===g.gid;
@@ -1702,7 +1757,8 @@ function afterOnlineRender(){
 function endGame(winner,reason){G.endInfo={winner:winner,reason:reason};G.screen='end';}
 
 var A={
-  setMode:function(v){mode=(v==='online')?'online':'local';OL.msg='';},
+  setMode:function(v){mode=(v==='online')?'online':'local';home=false;OL.msg='';},
+  goHome:function(){home=true;OL.msg='';},
   createOnline:function(){
     var nm=(OL.name||'').trim();
     if(OL.busy||OL.status!=='ok')return;
@@ -1858,7 +1914,7 @@ function sigNow(){
   if(pick.on)return 'pick';
   if(O)return O.game?('o|'+O.game.phase+'|'+oKey(O.game)+'|'+(O.showRole?1:0)):'o|conn';
   if(tour.on)return 't'+tour.i;
-  if(!G)return 's'+mode;
+  if(!G)return 's'+(home?'h':mode);
   return [G.screen,G.stage,G.idx,G.vstage,G.vi,G.mstage,G.mi,G.mission,G.rejects].join('|');
 }
 function render(){
