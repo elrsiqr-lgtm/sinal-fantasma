@@ -213,6 +213,8 @@ input[type=text]:focus{border-color:var(--res);outline:none}
 .tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;border:1px solid var(--line);border-radius:12px;background:var(--deck)}
 .tab{min-height:44px;border-radius:8px;font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
 .tab.on{background:var(--panel);color:var(--text);box-shadow:inset 0 0 0 1.5px var(--res)}
+.choice{flex-direction:column;align-items:flex-start;gap:6px;min-height:96px;text-align:left}
+.choice small{font-size:13px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--dim)}
 .obar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .ocode{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
 .ocode b{color:var(--text);font-family:var(--f-disp);font-weight:400;letter-spacing:.14em}
@@ -856,10 +858,16 @@ function tourView(){
 }
 
 /* ---------- telas ---------- */
-function tabs(){
-  return '<div class="tabs" role="tablist" aria-label="Como jogar">'
-  +'<button class="tab'+(mode==='local'?' on':'')+'" role="tab" aria-selected="'+(mode==='local')+'" data-a="setMode" data-v="local">No mesmo aparelho</button>'
-  +'<button class="tab'+(mode==='online'?' on':'')+'" role="tab" aria-selected="'+(mode==='online')+'" data-a="setMode" data-v="online">Online local</button></div>';
+function backBar(){
+  return '<div class="tourbar"><p class="eyebrow">'+(mode==='online'?'Online local':'No mesmo aparelho')+'</p><button class="skip" data-a="goHome">Voltar</button></div>';
+}
+function homeView(){
+  return '<div class="wrap">'
+  +'<header class="hero"><p class="eyebrow">Dedução social</p><h1 class="glitch"><span data-t="Sinal">Sinal</span><span data-t="Fantasma">Fantasma</span></h1></header>'
+  +'<section class="stack">'
+  +'<button class="btn choice" data-a="setMode" data-v="local"><strong>No mesmo aparelho</strong><small>Passe o celular de mão em mão.</small></button>'
+  +'<button class="btn choice" data-a="setMode" data-v="online"><strong>Online local</strong><small>Cada um joga no seu celular.</small></button>'
+  +'</section></div>';
 }
 function storyView(){
   return '<div class="wrap"><div class="tourbar"><p class="eyebrow">Antes de começar</p><button class="skip" data-a="storyBack">Voltar</button></div>'
@@ -880,17 +888,17 @@ function storyPicker(sel,act){
   });
   return h+'</div></section>';
 }
-function setupView(){return mode==='online'?onlineSetupView():localSetupView();}
+function setupView(){return home?homeView():mode==='online'?onlineSetupView():localSetupView();}
 function localSetupView(){
   var n=cfg.n,sp=SPIES[n];
   var inputs='';
   for(var i=0;i<n;i++){
     inputs+='<label for="nm'+i+'">Agente Rebelde '+(i+1)+'<input type="text" id="nm'+i+'" data-name="'+i+'" value="'+esc(cfg.names[i])+'" maxlength="18" autocomplete="off" placeholder="Codinome"></label>';
   }
-  return '<div class="wrap">'
+  return '<div class="wrap">'+backBar()
   +'<header class="hero"><p class="eyebrow">Dedução social</p><h1 class="glitch"><span data-t="Sinal">Sinal</span><span data-t="Fantasma">Fantasma</span></h1>'
   +'<p class="lead">Passe o celular de mão em mão. O jogo cuida dos papéis secretos, das votações e das cartas de missão.</p></header>'
-  +tabs()+'<section class="stack"><p class="eyebrow">Quantos vão jogar</p>'
+  +'<section class="stack"><p class="eyebrow">Quantos vão jogar</p>'
   +'<div class="stepper"><button id="dec" data-a="dec" aria-label="Um jogador a menos"'+(n<=5?' disabled':'')+'>−</button>'
   +'<div class="num" aria-live="polite">'+n+'</div>'
   +'<button id="inc" data-a="inc" aria-label="Um jogador a mais"'+(n>=10?' disabled':'')+'>+</button></div>'
@@ -1054,7 +1062,7 @@ function endView(){
 }
 
 /* ---------- online ---------- */
-var mode='local';
+var mode='local',home=true;
 var OL={status:'checking',db:null,user:null,id:null,name:'',code:'',msg:'',busy:false};
 var O=null;
 try{OL.name=localStorage.getItem('rd_name')||'';}catch(e){}
@@ -1462,10 +1470,10 @@ function onlineSetupView(){
     +'<button class="btn" data-a="joinOnline"'+dis+'>Entrar na partida</button>'
     +(OL.msg?'<p class="warn">'+esc(OL.msg)+'</p>':'');
   }
-  return '<div class="wrap">'
+  return '<div class="wrap">'+backBar()
   +'<header class="hero"><p class="eyebrow">Dedução social</p><h1 class="glitch"><span data-t="Sinal">Sinal</span><span data-t="Fantasma">Fantasma</span></h1>'
   +'<p class="lead">Cada um joga no seu celular. Um cria a partida e manda o código para os outros.</p></header>'
-  +tabs()+body+'<button class="btn" data-a="openTour">Ver como jogar</button></div>';
+  +body+'<button class="btn" data-a="openTour">Ver como jogar</button></div>';
 }
 function obar(){
   var g=O.game,playing=g&&g.phase!=='lobby'&&O.myRole&&O.myRole.gid===g.gid;
@@ -1702,7 +1710,8 @@ function afterOnlineRender(){
 function endGame(winner,reason){G.endInfo={winner:winner,reason:reason};G.screen='end';}
 
 var A={
-  setMode:function(v){mode=(v==='online')?'online':'local';OL.msg='';},
+  setMode:function(v){mode=(v==='online')?'online':'local';home=false;OL.msg='';},
+  goHome:function(){home=true;OL.msg='';},
   createOnline:function(){
     var nm=(OL.name||'').trim();
     if(OL.busy||OL.status!=='ok')return;
@@ -1858,7 +1867,7 @@ function sigNow(){
   if(pick.on)return 'pick';
   if(O)return O.game?('o|'+O.game.phase+'|'+oKey(O.game)+'|'+(O.showRole?1:0)):'o|conn';
   if(tour.on)return 't'+tour.i;
-  if(!G)return 's'+mode;
+  if(!G)return 's'+(home?'h':mode);
   return [G.screen,G.stage,G.idx,G.vstage,G.vi,G.mstage,G.mi,G.mission,G.rejects].join('|');
 }
 function render(){
