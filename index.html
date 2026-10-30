@@ -430,6 +430,19 @@ h1.glitch span:first-child{animation:glJ 3.4s infinite steps(1)}
 .hero h1.glitch{font-size:clamp(24px,10cqw,62px);overflow-wrap:normal;word-break:normal}
 .hero h1.glitch span{white-space:nowrap}
 
+/* escolha de modo: ocupa a altura da tela (celular) */
+body:has(.wrap.home){min-height:0}
+@media (max-width:899px){
+  .wrap.home{min-height:calc(100vh - 114px);min-height:calc(100dvh - 114px);justify-content:space-between}
+  .wrap.home .hero h1.glitch{font-size:11.6cqw}
+  .wrap.home .stack{gap:20px}
+  .wrap.home .choice{min-height:clamp(120px,19dvh,190px);padding:22px;justify-content:center}
+}
+@media (min-width:900px){
+  .wrap.home{min-height:calc(100vh - 142px);min-height:calc(100dvh - 142px);align-content:center}
+  .wrap.home .stack{gap:18px}
+}
+
 /* cenas 2 a 5: fundo com a mesma cidade do vídeo, em cores diferentes */
 .scene>*{position:relative;z-index:1}
 .scene>.vid,.scene>.sky,.scene>.pulse,.scene>.beam{position:absolute;z-index:0}
@@ -862,7 +875,7 @@ function backBar(){
   return '<div class="tourbar"><p class="eyebrow">'+(mode==='online'?'Online local':'No mesmo aparelho')+'</p><button class="skip" data-a="goHome">Voltar</button></div>';
 }
 function homeView(){
-  return '<div class="wrap">'
+  return '<div class="wrap home">'
   +'<header class="hero"><p class="eyebrow">Dedução social</p><h1 class="glitch"><span data-t="Sinal">Sinal</span><span data-t="Fantasma">Fantasma</span></h1></header>'
   +'<section class="stack">'
   +'<button class="btn choice" data-a="setMode" data-v="local"><strong>No mesmo aparelho</strong><small>Passe o celular de mão em mão.</small></button>'
