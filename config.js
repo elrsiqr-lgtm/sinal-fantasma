@@ -1,6 +1,4 @@
-// Preencha com os dados do seu projeto Supabase (Project Settings > API).
-// A chave "anon" é pública por desenho; quem protege os dados são as políticas do banco (supabase/schema.sql).
 window.SINAL_CONFIG={
-  supabaseUrl:'',
-  supabaseKey:''
+  supabaseUrl:'https://wgaiysapbelkgjkcsivk.supabase.co',
+  supabaseKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnYWl5c2FwYmVsa2dqa2NzaXZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzNTg0NTUsImV4cCI6MjEwODkzNDQ1NX0.eSQ_z8c5ZbBYxknDB9lNDPNAszvHyYK2Kt8j9GiStNo'
 };
