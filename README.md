@@ -16,6 +16,8 @@ Sirva a pasta (`npx serve`) e abra no navegador. O modo **No mesmo aparelho** fu
 A chave anon é pública por desenho. As partidas funcionam na confiança entre amigos (como no Claude): quem abre o jogo lê e grava na tabela `docs`.
 Para limpar partidas antigas: `select public.purge_old_games();` (ou agende no pg_cron).
 
+Para a limpeza rodar sozinha todo dia de madrugada: abra o **SQL Editor** do Supabase, cole o conteúdo de `supabase/cleanup-schedule.sql` e execute uma vez. Esse arquivo também explica como conferir que o agendamento foi criado e como desfazê-lo.
+
 ## Publicar a página
 GitHub Pages, Netlify ou Vercel: aponte para a raiz do repositório (sem build, sem comando).
 
