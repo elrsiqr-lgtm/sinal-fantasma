@@ -430,17 +430,44 @@ h1.glitch span:first-child{animation:glJ 3.4s infinite steps(1)}
 .hero h1.glitch{font-size:clamp(24px,10cqw,62px);overflow-wrap:normal;word-break:normal}
 .hero h1.glitch span{white-space:nowrap}
 
-/* escolha de modo: ocupa a altura da tela (celular) */
+/* ===== telas de início (escolha de modo, No mesmo aparelho, Online local): escala tipográfica e layout =====
+   Escala: título do jogo > título de seção > texto de apoio > rótulo/campo. O número de jogadores segue grande. */
+:root{
+  --fs-title:clamp(28px,11.6cqw,84px);
+  --fs-section:clamp(15px,.45vw + 12.5px,19px);
+  --fs-body:clamp(14px,.3vw + 12.5px,16.5px);
+  --fs-label:clamp(12px,.2vw + 10.5px,14px);
+  --fs-count:clamp(44px,2vw + 36px,60px);
+}
+.setup .hero h1.glitch{font-size:var(--fs-title)}
+.setup .eyebrow{font-size:var(--fs-section)}
+.setup .lead,.setup .warn,.setup .split,.setup .toggle strong,.setup .toggle small,.setup .choice small{font-size:var(--fs-body)}
+.setup .fieldlab,.setup .or,.setup .skip,.setup .names label,.setup input[type=text]{font-size:var(--fs-label)}
+.setup .ocodeinput{font-size:20px}
+.setup .stepper .num{font-size:var(--fs-count)}
+.setup .choice strong{font-size:var(--fs-section)}
 body:has(.wrap.home){min-height:0}
-@media (max-width:899px){
-  .wrap.home{min-height:calc(100vh - 114px);min-height:calc(100dvh - 114px);justify-content:space-between}
-  .wrap.home .hero h1.glitch{font-size:11.6cqw}
-  .wrap.home .stack{gap:20px}
-  .wrap.home .choice{min-height:clamp(120px,19dvh,190px);padding:22px;justify-content:center}
+.wrap.home{min-height:calc(100vh - 114px);min-height:calc(100dvh - 114px);justify-content:space-between}
+.wrap.home .stack{gap:20px}
+.wrap.home .choice{min-height:clamp(120px,19dvh,190px);padding:22px;justify-content:center}
+@media (min-width:700px){
+  .wrap.setup{max-width:720px}
+  .wrap.home .stack{flex-direction:row;gap:24px}
+  .wrap.home .choice{flex:1;min-height:clamp(170px,22dvh,240px);padding:28px}
 }
 @media (min-width:900px){
-  .wrap.home{min-height:calc(100vh - 142px);min-height:calc(100dvh - 142px);align-content:center}
-  .wrap.home .stack{gap:18px}
+  /* coluna única centralizada, com fontes e espaços maiores */
+  .wrap.setup{display:flex;flex-direction:column;align-items:stretch;gap:32px;max-width:720px}
+  .wrap.setup>*{margin-bottom:0}
+  .wrap.setup>.hero{position:static;top:auto;align-self:stretch}
+  .wrap.setup .stack{gap:14px}
+  .wrap.setup .names{gap:14px}
+  .wrap.setup input[type=text]{min-height:52px;padding:12px 14px}
+  .wrap.setup .stepper{grid-template-columns:68px 1fr 68px;gap:14px}
+  .wrap.setup .stepper button{height:68px}
+  .wrap.setup .toggle{padding:18px}
+  .wrap.home{min-height:calc(100vh - 142px);min-height:calc(100dvh - 142px);justify-content:center;gap:56px}
+  .wrap.home .stack{gap:28px}
 }
 
 /* cenas 2 a 5: fundo com a mesma cidade do vídeo, em cores diferentes */
@@ -875,7 +902,7 @@ function backBar(){
   return '<div class="tourbar"><p class="eyebrow">'+(mode==='online'?'Online local':'No mesmo aparelho')+'</p><button class="skip" data-a="goHome">Voltar</button></div>';
 }
 function homeView(){
-  return '<div class="wrap home">'
+  return '<div class="wrap home setup">'
   +'<header class="hero"><p class="eyebrow">Dedução social</p><h1 class="glitch"><span data-t="Sinal">Sinal</span><span data-t="Fantasma">Fantasma</span></h1></header>'
   +'<section class="stack">'
   +'<button class="btn choice" data-a="setMode" data-v="local"><strong>No mesmo aparelho</strong><small>Passe o celular de mão em mão.</small></button>'
@@ -908,7 +935,7 @@ function localSetupView(){
   for(var i=0;i<n;i++){
     inputs+='<label for="nm'+i+'">Agente Rebelde '+(i+1)+'<input type="text" id="nm'+i+'" data-name="'+i+'" value="'+esc(cfg.names[i])+'" maxlength="18" autocomplete="off" placeholder="Codinome"></label>';
   }
-  return '<div class="wrap">'+backBar()
+  return '<div class="wrap setup">'+backBar()
   +'<header class="hero"><p class="eyebrow">Dedução social</p><h1 class="glitch"><span data-t="Sinal">Sinal</span><span data-t="Fantasma">Fantasma</span></h1>'
   +'<p class="lead">Passe o celular de mão em mão. O jogo cuida dos papéis secretos, das votações e das cartas de missão.</p></header>'
   +'<section class="stack"><p class="eyebrow">Quantos vão jogar</p>'
@@ -1483,7 +1510,7 @@ function onlineSetupView(){
     +'<button class="btn" data-a="joinOnline"'+dis+'>Entrar na partida</button>'
     +(OL.msg?'<p class="warn">'+esc(OL.msg)+'</p>':'');
   }
-  return '<div class="wrap">'+backBar()
+  return '<div class="wrap setup">'+backBar()
   +'<header class="hero"><p class="eyebrow">Dedução social</p><h1 class="glitch"><span data-t="Sinal">Sinal</span><span data-t="Fantasma">Fantasma</span></h1>'
   +'<p class="lead">Cada um joga no seu celular. Um cria a partida e manda o código para os outros.</p></header>'
   +body+'<button class="btn" data-a="openTour">Ver como jogar</button></div>';
