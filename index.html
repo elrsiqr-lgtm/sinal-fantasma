@@ -1,0 +1,2129 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sinal Fantasma</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Michroma&display=swap">
+<style>
+/* Layout: uma coluna estreita feita para passar o celular de mão em mão. O placar das missões fica no topo de toda tela pública. Fundo de cidade à noite com grade discreta. */
+:root{
+  --void:#060a13;
+  --deck:#0d1524;
+  --panel:#111c2f;
+  --line:#22314d;
+  --text:#e1ebf8;
+  --dim:#8196b5;
+  --res:#35d4ea;
+  --res-ink:#032a31;
+  --spy:#ee4a3f;
+  --amber:#f4b94a;
+  --f-disp:'Michroma','Eurostile','Arial Black',sans-serif;
+  --f-body:'Chakra Petch','Segoe UI',system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+h1,h2,h3,p,ul,ol{margin:0}
+ul,ol{padding:0;list-style:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+body{
+  background-color:var(--void);
+  background-image:
+    radial-gradient(120% 55% at 50% -8%,rgba(53,212,234,.16),transparent 62%),
+    linear-gradient(rgba(130,160,210,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(130,160,210,.05) 1px,transparent 1px);
+  background-size:auto,32px 32px,32px 32px;
+  color:var(--text);
+  font-family:var(--f-body);
+  font-size:16px;
+  line-height:1.45;
+  padding-block:22px 76px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  min-height:100vh;
+}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.stack{display:flex;flex-direction:column;gap:12px;min-width:0}
+h1{font-family:var(--f-disp);font-weight:400;font-size:clamp(24px,8.5vw,48px);line-height:1.12;letter-spacing:.03em;text-transform:uppercase}
+h2{font-family:var(--f-disp);font-weight:400;font-size:clamp(17px,5.2vw,22px);line-height:1.3;letter-spacing:.02em;text-wrap:balance;overflow-wrap:anywhere}
+h3{font-family:var(--f-disp);font-weight:400;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);font-weight:600}
+.lead{color:var(--dim);max-width:60ch}
+.hl{color:var(--amber)}
+.note{padding:10px 14px;border-radius:10px;border:1px solid var(--amber);color:var(--amber);font-size:14px}
+.warn{padding:10px 14px;border-radius:10px;border:1px solid var(--spy);color:#ff9d95;font-size:14px}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:54px;padding:12px 18px;border-radius:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;font-size:14px;border:1.5px solid var(--line);background:var(--panel);transition:transform .12s,background .15s,border-color .15s}
+.btn:active{transform:scale(.98)}
+.btn:hover{border-color:var(--dim)}
+.btn.primary{background:var(--res);border-color:var(--res);color:var(--res-ink)}
+.btn.primary:hover{background:#5fe0f1}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+
+.hero{display:flex;flex-direction:column;gap:14px;padding-top:6px}
+.hero h1{background:linear-gradient(180deg,#fff 20%,#9fdcec);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+.stepper{display:grid;grid-template-columns:58px 1fr 58px;align-items:center;gap:10px}
+.stepper button{height:58px;border:1.5px solid var(--line);border-radius:10px;background:var(--panel);font-size:26px;line-height:1}
+.stepper button:disabled{opacity:.3;cursor:not-allowed}
+.stepper .num{font-family:var(--f-disp);font-size:44px;text-align:center;font-variant-numeric:tabular-nums}
+.split{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;font-weight:600;font-size:14px;letter-spacing:.05em;text-transform:uppercase}
+.res-t{color:var(--res)}
+.spy-t{color:var(--spy)}
+
+.names{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.names label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--dim);min-width:0}
+input[type=text]{width:100%;min-height:46px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--line);background:var(--deck);color:var(--text);font:inherit}
+input[type=text]:focus{border-color:var(--res);outline:none}
+@media(max-width:380px){.names{grid-template-columns:1fr}}
+
+.toggle{display:flex;gap:14px;align-items:flex-start;padding:14px;border:1.5px solid var(--line);border-radius:12px;background:var(--deck);cursor:pointer;position:relative}
+.toggle input{position:absolute;opacity:0;width:1px;height:1px}
+.toggle .sw{flex:none;width:46px;height:26px;border-radius:999px;background:var(--line);position:relative;margin-top:2px;transition:background .2s}
+.toggle .sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--text);transition:transform .2s}
+.toggle input:checked+.sw{background:var(--spy)}
+.toggle input:checked+.sw::after{transform:translateX(20px)}
+.toggle input:focus-visible+.sw{outline:2px solid var(--amber);outline-offset:3px}
+.toggle strong{display:block}
+.toggle small{display:block;color:var(--dim);font-size:13px;line-height:1.4;margin-top:2px}
+
+.how{border-top:1px solid var(--line);padding-top:14px;color:var(--dim)}
+.how summary{cursor:pointer;font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:13px;color:var(--text)}
+.how p{margin-top:10px;font-size:14px}
+
+.board{padding:16px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,rgba(17,28,47,.92),rgba(13,21,36,.92));display:flex;flex-direction:column;gap:14px}
+.track{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.node{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.dot{width:min(100%,58px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;border:2px solid var(--line);background:var(--deck);font-family:var(--f-disp);font-size:18px;color:var(--dim);font-variant-numeric:tabular-nums}
+.dot svg{width:55%;height:55%}
+.node.now .dot{border-color:var(--res);color:var(--text);box-shadow:0 0 0 4px rgba(53,212,234,.16),0 0 22px rgba(53,212,234,.35)}
+.node.win .dot{background:var(--res);border-color:var(--res);color:var(--res-ink)}
+.node.lose .dot{background:var(--spy);border-color:var(--spy);color:#fff}
+.lab{font-size:11px;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;font-weight:600}
+.dbl{font-size:10px;color:var(--amber);text-align:center;line-height:1.15}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:8px 14px;flex-wrap:wrap;font-size:13px;color:var(--dim)}
+.pips{display:inline-flex;gap:5px;vertical-align:middle;margin-left:6px}
+.pip{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--dim)}
+.pip.on{background:var(--spy);border-color:var(--spy)}
+
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pbtn{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;padding:14px;min-height:58px;border-radius:10px;border:1.5px solid var(--line);background:var(--panel);min-width:0}
+.pbtn .nm{overflow-wrap:anywhere;font-weight:500}
+.pbtn .tag{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);font-weight:700;flex:none}
+.pbtn.on{border-color:var(--res);background:rgba(53,212,234,.14)}
+.pbtn .ck{flex:none;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;color:var(--res-ink)}
+.pbtn.on .ck{background:var(--res);border-color:var(--res)}
+.pbtn .ck svg{width:12px;height:12px;opacity:0}
+.pbtn.on .ck svg{opacity:1}
+.count{text-align:center;font-family:var(--f-disp);font-size:14px;letter-spacing:.08em;color:var(--dim);font-variant-numeric:tabular-nums}
+
+.handoff{display:flex;flex-direction:column;gap:18px;align-items:center;text-align:center;padding:40px 4px 8px}
+.who{font-family:var(--f-disp);font-size:clamp(26px,9vw,40px);overflow-wrap:anywhere;line-height:1.15}
+.handoff .lead{max-width:34ch}
+
+.role{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:28px 20px;border-radius:16px;border:1.5px solid}
+.role.res{border-color:var(--res);color:var(--res);background:radial-gradient(90% 70% at 50% 0%,rgba(53,212,234,.2),transparent 70%),var(--panel)}
+.role.spy{border-color:var(--spy);color:var(--spy);background:radial-gradient(90% 70% at 50% 0%,rgba(238,74,63,.22),transparent 70%),var(--panel)}
+.role h2{font-size:clamp(19px,6vw,26px);text-transform:uppercase}
+.role p{color:var(--text)}
+.emb{width:92px;height:92px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip{padding:6px 14px;border-radius:999px;border:1px solid currentColor;font-size:14px;color:var(--text);overflow-wrap:anywhere}
+.role .eyebrow{color:inherit;opacity:.8}
+
+.teamline{padding:12px 14px;border-radius:10px;background:var(--deck);border:1px solid var(--line);font-size:14px}
+.teamline b{color:var(--amber);font-weight:600}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.big{min-height:160px;flex-direction:column;border-radius:14px;border:2px solid;font-family:var(--f-disp);font-size:14px;letter-spacing:.06em;background:var(--deck)}
+.big svg{width:52px;height:52px}
+.big.yes{border-color:var(--res);color:var(--res)}
+.big.yes.sel{background:var(--res);color:var(--res-ink)}
+.big.no{border-color:var(--spy);color:var(--spy)}
+.big.no.sel{background:var(--spy);color:#fff}
+.big:hover{border-color:currentColor}
+
+.vtally{font-family:var(--f-disp);font-size:clamp(34px,11vw,52px);text-align:center;font-variant-numeric:tabular-nums;letter-spacing:.06em}
+.vtally .a{color:var(--res)}
+.vtally .r{color:var(--spy)}
+.vlist{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.vrow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;background:var(--deck);border-radius:8px;border-left:4px solid;min-width:0;font-size:14px}
+.vrow .nm{overflow-wrap:anywhere}
+.vrow.A{border-color:var(--res)}
+.vrow.R{border-color:var(--spy)}
+.vrow span.v{flex:none;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+.vrow.A .v{color:var(--res)}
+.vrow.R .v{color:var(--spy)}
+
+.flips{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;padding:6px 0}
+.c3d{width:84px;height:120px;perspective:600px}
+.c3d .in{position:relative;width:100%;height:100%;transition:transform .7s cubic-bezier(.3,.7,.2,1);transform-style:preserve-3d}
+.c3d.up .in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:10px;display:grid;place-items:center;border:2px solid;-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.face.back{background:repeating-linear-gradient(45deg,var(--deck),var(--deck) 6px,var(--panel) 6px,var(--panel) 12px);border-color:var(--line)}
+.face.front{transform:rotateY(180deg);background:var(--panel)}
+.face.front.S{border-color:var(--res);color:var(--res)}
+.face.front.F{border-color:var(--spy);color:var(--spy)}
+.face svg{width:44px;height:44px}
+.verdict{text-align:center;display:flex;flex-direction:column;gap:14px;align-items:stretch}
+.verdict h2{font-size:clamp(20px,6.4vw,28px);text-transform:uppercase}
+.verdict.ok h2{color:var(--res)}
+.verdict.bad h2{color:var(--spy)}
+.verdict p{color:var(--dim)}
+
+.banner{padding:30px 20px;border-radius:16px;border:1.5px solid;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.banner.res{border-color:var(--res);color:var(--res);background:radial-gradient(90% 80% at 50% 0%,rgba(53,212,234,.22),transparent 70%),var(--panel)}
+.banner.spy{border-color:var(--spy);color:var(--spy);background:radial-gradient(90% 80% at 50% 0%,rgba(238,74,63,.24),transparent 70%),var(--panel)}
+.banner p{color:var(--text)}
+.banner .eyebrow{color:inherit;opacity:.8}
+.roles{display:flex;flex-direction:column;gap:8px}
+.rrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;background:var(--deck);border-left:4px solid}
+.rrow.res{border-color:var(--res)}
+.rrow.spy{border-color:var(--spy)}
+.rrow .nm{overflow-wrap:anywhere}
+.rrow .rl{flex:none;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+.rrow.res .rl{color:var(--res)}
+.rrow.spy .rl{color:var(--spy)}
+.log{display:flex;flex-direction:column;gap:10px}
+.log li{padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--deck);font-size:14px;display:flex;flex-direction:column;gap:3px;min-width:0;overflow-wrap:anywhere}
+.log .dim{color:var(--dim)}
+.log .okt{color:var(--res);font-weight:600}
+.log .badt{color:var(--spy);font-weight:600}
+.actions{display:flex;flex-direction:column;gap:10px}
+
+.tourbar{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.skip{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:8px 4px;font-weight:600}
+.skip:hover{color:var(--text)}
+.illus{display:flex;align-items:center;justify-content:center;gap:22px;flex-wrap:wrap;min-height:190px;padding:24px 16px;border:1px solid var(--line);border-radius:16px;background:radial-gradient(90% 90% at 50% 0%,rgba(53,212,234,.1),transparent 70%),var(--deck)}
+.illus .emb{width:68px;height:68px}
+.ill-col{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;min-width:0}
+.ill-col span{font-family:var(--f-disp);font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.ill-col small{color:var(--dim);font-size:13px;max-width:30ch}
+.ill-col.res{color:var(--res)}
+.ill-col.spy{color:var(--spy)}
+.ill-col.full{width:100%}
+.ill-arrow{font-size:28px;color:var(--dim)}
+.illus .vtally{font-size:46px}
+.illus .track{width:100%}
+.dots{display:flex;justify-content:center;gap:8px;align-items:center}
+.dots i{display:block;width:8px;height:8px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--res);width:22px;border-radius:999px}
+.tour .lead{color:var(--text)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;border:1px solid var(--line);border-radius:12px;background:var(--deck)}
+.tab{min-height:44px;border-radius:8px;font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+.tab.on{background:var(--panel);color:var(--text);box-shadow:inset 0 0 0 1.5px var(--res)}
+.obar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.ocode{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.ocode b{color:var(--text);font-family:var(--f-disp);font-weight:400;letter-spacing:.14em}
+.obtns{display:flex;gap:8px}
+.mini{min-height:36px;padding:6px 12px;border-radius:8px;border:1.5px solid var(--line);background:var(--panel);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.codebox{display:flex;flex-direction:column;align-items:center;gap:12px;padding:22px 16px;border:1.5px dashed var(--res);border-radius:14px;background:var(--deck)}
+.code{font-family:var(--f-disp);font-size:clamp(34px,13vw,54px);letter-spacing:.2em;color:var(--res);padding-left:.2em;user-select:all;-webkit-user-select:all}
+.ocodeinput{text-transform:uppercase;letter-spacing:.3em;font-family:var(--f-disp);font-size:20px;text-align:center}
+.or{text-align:center;color:var(--dim);font-size:12px;letter-spacing:.2em;text-transform:uppercase}
+.fieldlab{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);font-weight:600}
+@media (prefers-reduced-motion:reduce){
+  .c3d .in,.btn,.toggle .sw,.toggle .sw::after{transition:none}
+}
+
+/* ===== Camada 3D ===== */
+:root{--edge:#0a1120;--res-edge:#12707e;--spy-edge:#8a251e}
+.emb3-wrap{display:block;position:relative;width:92px;height:92px;perspective:520px;flex:none}
+.illus .emb3-wrap{width:68px;height:68px}
+.emb3-wrap::after{content:"";position:absolute;left:12%;right:12%;bottom:-16px;height:14px;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.55),transparent);filter:blur(2px)}
+.emb3{position:absolute;inset:0;display:block;transform-style:preserve-3d;animation:sway 3.6s ease-in-out infinite alternate;will-change:transform}
+.emb3.res{--c:var(--res);--cd:#16626e;--ft:rgba(53,212,234,.16)}
+.emb3.spy{--c:var(--spy);--cd:#7d2420;--ft:rgba(238,74,63,.18)}
+.emb3 svg{position:absolute;inset:0;width:100%;height:100%;transform:translateZ(var(--z));overflow:visible;stroke:var(--cd);fill:none}
+.emb3 svg .o{fill:var(--cd)}
+.emb3 svg.top{stroke:var(--c);filter:drop-shadow(0 0 5px var(--c))}
+.emb3 svg.top .o{fill:var(--ft)}
+.emb3.spy svg circle:not(.o){fill:var(--cd)}
+.emb3.spy svg.top circle:not(.o){fill:var(--c)}
+@keyframes sway{from{transform:rotateX(-14deg) rotateY(-30deg)}to{transform:rotateX(-6deg) rotateY(30deg)}}
+
+.role,.banner{position:relative;transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transform-style:preserve-3d;transition:transform .18s ease-out;
+  box-shadow:0 1px 0 var(--edge-c),0 2px 0 var(--edge-c),0 3px 0 var(--edge-c),0 4px 0 var(--edge-c),0 5px 0 var(--edge-c),0 6px 0 var(--edge-c),0 22px 34px rgba(0,0,0,.55)}
+.role.res,.banner.res{--edge-c:var(--res-edge)}
+.role.spy,.banner.spy{--edge-c:var(--spy-edge)}
+.role>.emb3-wrap,.banner>.emb3-wrap{transform:translateZ(44px)}
+.role>h2,.banner>h2{transform:translateZ(26px)}
+.role::after,.banner::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(60% 50% at var(--gx,50%) var(--gy,0%),rgba(255,255,255,.14),transparent 70%)}
+
+/* botões como teclas */
+.btn{box-shadow:0 4px 0 var(--edge),0 9px 14px rgba(0,0,0,.35);transform:translateY(0)}
+.btn:hover{transform:translateY(-1px);box-shadow:0 5px 0 var(--edge),0 11px 16px rgba(0,0,0,.35)}
+.btn:active{transform:translateY(4px);box-shadow:0 0 0 var(--edge),0 2px 4px rgba(0,0,0,.4)}
+.btn.primary{background:linear-gradient(180deg,#7be9f8,#35d4ea 60%);box-shadow:0 4px 0 var(--res-edge),0 10px 18px rgba(53,212,234,.28)}
+.btn.primary:hover{background:linear-gradient(180deg,#9af0fb,#4adcf0 60%);box-shadow:0 5px 0 var(--res-edge),0 12px 20px rgba(53,212,234,.3)}
+.btn.primary:active{box-shadow:0 0 0 var(--res-edge),0 2px 5px rgba(53,212,234,.3)}
+.btn:disabled,.btn:disabled:hover,.btn:disabled:active{transform:translateY(4px);box-shadow:0 0 0 var(--edge)}
+.pair{margin-bottom:10px}
+.big{transform:perspective(520px) rotateX(10deg);transform-origin:50% 100%;box-shadow:0 8px 0 var(--edge),0 16px 22px rgba(0,0,0,.4);transition:transform .12s,box-shadow .12s,background .15s;position:relative}
+.big::before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,.12),transparent 45%);pointer-events:none}
+.big.yes{box-shadow:0 8px 0 var(--res-edge),0 16px 22px rgba(0,0,0,.4)}
+.big.no{box-shadow:0 8px 0 var(--spy-edge),0 16px 22px rgba(0,0,0,.4)}
+.big svg{filter:drop-shadow(0 3px 0 rgba(0,0,0,.35))}
+.big:hover{transform:perspective(520px) rotateX(6deg) translateY(-2px)}
+.big:active,.big.sel{transform:perspective(520px) rotateX(0deg) translateY(6px)}
+.big.yes:active,.big.yes.sel{box-shadow:0 2px 0 var(--res-edge),0 4px 8px rgba(0,0,0,.4)}
+.big.no:active,.big.no.sel{box-shadow:0 2px 0 var(--spy-edge),0 4px 8px rgba(0,0,0,.4)}
+.pbtn,.stepper button,.mini{box-shadow:0 3px 0 var(--edge),0 6px 10px rgba(0,0,0,.3);transition:transform .1s,box-shadow .1s,background .15s,border-color .15s}
+.pbtn:active,.stepper button:active:not(:disabled),.mini:active{transform:translateY(3px);box-shadow:0 0 0 var(--edge)}
+.pbtn.on{transform:translateY(3px);box-shadow:0 0 0 var(--edge),0 0 16px rgba(53,212,234,.25)}
+.stepper button:disabled{box-shadow:none}
+.tab.on{box-shadow:inset 0 0 0 1.5px var(--res),0 3px 0 var(--edge)}
+.pbtn .ck{background:radial-gradient(circle at 35% 30%,#1c2c47,var(--deck))}
+.pbtn.on .ck{background:radial-gradient(circle at 35% 30%,#9cf1fb,var(--res))}
+.teamline,.vrow,.rrow,.log li,.toggle,.codebox,input[type=text]{box-shadow:0 2px 0 var(--edge),0 6px 10px rgba(0,0,0,.25)}
+.toggle .sw::after{background:radial-gradient(circle at 35% 30%,#fff,#b9c9e2);box-shadow:0 2px 3px rgba(0,0,0,.5)}
+
+/* placar: moedas sobre um tabuleiro inclinado */
+.board{perspective:760px;box-shadow:0 1px 0 #17233b,0 2px 0 #152036,0 3px 0 #121c30,0 4px 0 #0f1829,0 5px 0 #0c1424,0 18px 28px rgba(0,0,0,.5)}
+.track{transform:rotateX(18deg);transform-origin:50% 90%;transform-style:preserve-3d;padding-bottom:8px}
+.dot{transform:translateZ(8px);border:2px solid #2c4166;background:radial-gradient(circle at 34% 26%,#2b4068,var(--deck) 66%);
+  box-shadow:inset 0 2px 3px rgba(255,255,255,.18),inset 0 -4px 6px rgba(0,0,0,.5),0 1px 0 #1a2740,0 2px 0 #162137,0 3px 0 #121b2e,0 4px 0 #0e1626,0 5px 0 #0a1120,0 14px 14px rgba(0,0,0,.5)}
+.node.now .dot{transform:translateZ(18px);box-shadow:inset 0 2px 3px rgba(255,255,255,.2),inset 0 -4px 6px rgba(0,0,0,.5),0 1px 0 #0f5d69,0 2px 0 #0f5d69,0 3px 0 #0d4f59,0 4px 0 #0b434c,0 5px 0 #09363d,0 0 0 4px rgba(53,212,234,.16),0 0 24px rgba(53,212,234,.45),0 20px 16px rgba(0,0,0,.45)}
+.node.win .dot{background:radial-gradient(circle at 34% 26%,#b7f6ff,var(--res) 58%,#1796a8);box-shadow:inset 0 2px 3px rgba(255,255,255,.5),inset 0 -4px 6px rgba(0,30,40,.4),0 1px 0 #12707e,0 2px 0 #11697a,0 3px 0 #0f6170,0 4px 0 #0d5865,0 5px 0 #0b4e5a,0 14px 14px rgba(0,0,0,.5)}
+.node.lose .dot{background:radial-gradient(circle at 34% 26%,#ffb0a9,var(--spy) 58%,#a82a22);box-shadow:inset 0 2px 3px rgba(255,255,255,.4),inset 0 -4px 6px rgba(50,0,0,.4),0 1px 0 #8a251e,0 2px 0 #7f221b,0 3px 0 #741f19,0 4px 0 #691c16,0 5px 0 #5d1913,0 14px 14px rgba(0,0,0,.5)}
+.node.win .dot svg,.node.lose .dot svg{filter:drop-shadow(0 2px 0 rgba(0,0,0,.3))}
+.pip{background:radial-gradient(circle at 35% 30%,#2a3b5c,var(--deck));box-shadow:0 2px 0 var(--edge)}
+.pip.on{background:radial-gradient(circle at 35% 30%,#ffb0a9,var(--spy) 60%,#a82a22)}
+
+/* cartas de missão com espessura */
+.c3d{position:relative;width:88px;height:124px;perspective:700px}
+.c3d::after{content:"";position:absolute;left:8%;right:8%;bottom:-18px;height:14px;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.55),transparent);filter:blur(2px)}
+.c3d .in{transform:rotateX(-10deg) rotateY(-12deg);transition:transform .8s cubic-bezier(.3,.7,.2,1)}
+.c3d.up .in{transform:rotateX(-10deg) rotateY(168deg)}
+.c3d .sl{position:absolute;inset:0;border-radius:10px;background:#2a3c5e;pointer-events:none}
+.c3d .sl:nth-child(1){transform:translateZ(-1.5px)}
+.c3d .sl:nth-child(2){transform:translateZ(-.5px)}
+.c3d .sl:nth-child(3){transform:translateZ(.5px)}
+.c3d .sl:nth-child(4){transform:translateZ(1.5px)}
+.face.back{transform:translateZ(2.5px);background:radial-gradient(circle at 50% 50%,rgba(53,212,234,.18),transparent 55%),repeating-linear-gradient(45deg,var(--deck),var(--deck) 6px,var(--panel) 6px,var(--panel) 12px)}
+.face.front{transform:rotateY(180deg) translateZ(2.5px);background:linear-gradient(135deg,rgba(255,255,255,.1),transparent 40%),var(--panel)}
+.face.front.S{box-shadow:inset 0 0 18px rgba(53,212,234,.25)}
+.face.front.F{box-shadow:inset 0 0 18px rgba(238,74,63,.28)}
+.face.front svg{filter:drop-shadow(0 0 6px currentColor)}
+
+/* textos com relevo */
+.who{text-shadow:0 1px 0 #1d2d4d,0 2px 0 #172540,0 3px 0 #111c33,0 10px 16px rgba(0,0,0,.55)}
+h1{filter:drop-shadow(0 2px 0 #0b3b47) drop-shadow(0 3px 0 #08303a) drop-shadow(0 12px 14px rgba(0,0,0,.5))}
+.code{text-shadow:0 1px 0 #12707e,0 2px 0 #0f5f6c,0 3px 0 #0c4f5a,0 12px 18px rgba(0,0,0,.5)}
+.vtally{text-shadow:0 2px 0 rgba(0,0,0,.45),0 3px 0 rgba(0,0,0,.35),0 10px 16px rgba(0,0,0,.45)}
+.illus{perspective:700px;box-shadow:0 3px 0 var(--edge),0 12px 22px rgba(0,0,0,.35)}
+
+h1{overflow-wrap:anywhere}
+.illus{gap:18px}
+.ill-col{flex:0 1 auto;margin-inline:auto}
+.illus .emb3-wrap{margin-bottom:12px}
+@media (prefers-reduced-motion:reduce){
+  .emb3{animation:none;transform:rotateX(-10deg) rotateY(-20deg)}
+  .role,.banner,.btn,.big,.pbtn,.c3d .in{transition:none}
+}
+
+#mus{position:fixed;z-index:20;bottom:16px;right:max(16px,env(safe-area-inset-right,0px));width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:var(--res);border:1.5px solid var(--line);background:radial-gradient(circle at 35% 30%,#1c2c47,var(--deck));box-shadow:0 3px 0 var(--edge),0 8px 14px rgba(0,0,0,.45);opacity:.92;transition:transform .1s,box-shadow .1s}
+#mus:active{transform:translateY(3px);box-shadow:0 0 0 var(--edge)}
+#mus svg{width:22px;height:22px}
+#mus.off{color:var(--dim)}
+
+.story{position:relative;padding:14px 16px 14px 18px;border-radius:12px;background:linear-gradient(180deg,rgba(244,185,74,.1),rgba(244,185,74,.03)),var(--deck);border:1px solid rgba(244,185,74,.35);display:flex;flex-direction:column;gap:8px;box-shadow:0 3px 0 var(--edge),0 10px 16px rgba(0,0,0,.3)}
+.story::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:3px;background:var(--amber)}
+.story .eyebrow{color:var(--amber)}
+.story p:not(.eyebrow){font-size:15px;line-height:1.5}
+.story .story-pro{color:var(--dim);font-style:italic}
+.verdict .story-out,.story-out{font-style:italic;color:var(--text);padding:10px 14px;border-left:3px solid currentColor;border-radius:4px;text-align:left}
+.verdict.ok .story-out{border-color:var(--res)}
+.verdict.bad .story-out{border-color:var(--spy)}
+.story-end{font-style:italic;color:var(--text);opacity:.9;max-width:38ch}
+
+/* logo com glitch */
+h1.glitch{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:var(--text);filter:drop-shadow(0 3px 0 #0b3b47) drop-shadow(0 12px 14px rgba(0,0,0,.5))}
+h1.glitch span{display:block;position:relative;width:max-content;max-width:100%;background:linear-gradient(180deg,#fff 20%,#9fdcec);-webkit-background-clip:text;background-clip:text;color:transparent}
+h1.glitch span::before,h1.glitch span::after{content:attr(data-t);position:absolute;left:0;top:0;width:100%;background:none;-webkit-background-clip:border-box;background-clip:border-box;overflow:hidden;opacity:0}
+h1.glitch span::before{color:var(--res);text-shadow:none;animation:glA 3.4s infinite steps(1)}
+h1.glitch span::after{color:var(--spy);animation:glB 3.4s infinite steps(1)}
+h1.glitch span:nth-child(2)::before{animation-delay:-.7s}
+h1.glitch span:nth-child(2)::after{animation-delay:-.7s}
+@keyframes glA{0%,86%,100%{opacity:0;transform:none;clip-path:inset(0 0 0 0)}87%{opacity:1;transform:translate(-4px,1px);clip-path:inset(10% 0 62% 0)}90%{opacity:1;transform:translate(3px,-1px);clip-path:inset(54% 0 18% 0)}93%{opacity:1;transform:translate(-2px,0);clip-path:inset(30% 0 40% 0)}96%{opacity:0}}
+@keyframes glB{0%,87%,100%{opacity:0;transform:none;clip-path:inset(0 0 0 0)}88%{opacity:1;transform:translate(4px,-1px);clip-path:inset(60% 0 8% 0)}91%{opacity:1;transform:translate(-3px,1px);clip-path:inset(6% 0 70% 0)}94%{opacity:1;transform:translate(2px,0);clip-path:inset(42% 0 30% 0)}97%{opacity:0}}
+h1.glitch span:first-child{animation:glJ 3.4s infinite steps(1)}
+@keyframes glJ{0%,88%,100%{transform:none}89%{transform:translateX(2px)}92%{transform:translateX(-2px)}95%{transform:none}}
+
+/* abertura */
+.scene{position:relative;height:auto;aspect-ratio:72/67;border-radius:16px;overflow:hidden;border:1px solid var(--line);display:grid;place-items:center;color:var(--res);background:radial-gradient(90% 90% at 50% 100%,rgba(53,212,234,.2),transparent 70%),#070d18;box-shadow:0 4px 0 var(--edge),0 16px 24px rgba(0,0,0,.45)}
+.scene::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 1px,transparent 1px 3px);animation:flick 5s infinite steps(1)}
+@keyframes flick{0%,92%,100%{opacity:1}94%{opacity:.4}96%{opacity:.9}}
+.scene .sky{position:absolute;inset:0;width:100%;height:100%}
+.sky .win{fill:var(--amber);opacity:.85;animation:blink 4s infinite steps(1)}
+.sky .win.w1{fill:var(--res)}
+.sky .win:nth-child(3n){animation-delay:-1.3s}
+.sky .win:nth-child(5n){animation-delay:-2.6s}
+@keyframes blink{0%,90%,100%{opacity:.85}93%{opacity:.15}}
+.sky .eye{animation:eye 2.4s ease-in-out infinite;filter:drop-shadow(0 0 6px #ee4a3f)}
+@keyframes eye{50%{opacity:.35}}
+.bcast{width:150px;height:140px;filter:drop-shadow(0 0 8px currentColor)}
+.bcast .a1{animation:arc 2.2s infinite steps(1)}.bcast .a2{animation:arc 2.2s .35s infinite steps(1)}.bcast .a3{animation:arc 2.2s .7s infinite steps(1)}
+@keyframes arc{0%,60%{opacity:1}70%{opacity:.1}85%{opacity:.8}100%{opacity:.1}}
+.pulse{position:absolute;inset:0;display:grid;place-items:center}
+.pulse i{position:absolute;width:90px;height:90px;border-radius:50%;border:2px solid var(--res);opacity:0;animation:ring 3s ease-out infinite}
+.pulse i:nth-child(2){animation-delay:1s}.pulse i:nth-child(3){animation-delay:2s}
+@keyframes ring{0%{transform:scale(.6);opacity:.8}100%{transform:scale(2.6);opacity:0}}
+.duo{display:flex;gap:34px;align-items:center}
+.duo .emb3.spy{--c:var(--spy)}
+.gspy{display:block}
+@keyframes gshake{0%,90%,100%{transform:none}91%{transform:translate(-4px,1px) skewX(6deg)}93%{transform:translate(4px,-1px) skewX(-6deg)}95%{transform:none}}
+.scene .track{position:relative;z-index:1;width:min(100%,340px);padding:0 12px;transform:none}
+.scene .dot{transform:none}
+.lines{display:flex;flex-direction:column;gap:12px;min-height:150px}
+.lines h2{font-size:clamp(18px,5.6vw,24px);text-transform:none;line-height:1.35}
+.lines h2,.lines p{opacity:0;animation:rise .9s ease forwards;animation-delay:var(--d,0s)}
+.lines p{color:var(--text);opacity:0}
+@keyframes rise{from{opacity:0;transform:translateY(10px);filter:blur(5px)}to{opacity:1;transform:none;filter:none}}
+@media (prefers-reduced-motion:reduce){
+  h1.glitch span,h1.glitch span::before,h1.glitch span::after,.sky .win,.sky .eye,.bcast path,.pulse i,.gspy,.scene::after{animation:none}
+  .lines h2,.lines p{animation:none;opacity:1}
+}
+
+.story .story-link{padding-left:10px;border-left:3px solid var(--res);color:var(--text)}
+.story .story-link.bad{border-color:var(--spy)}
+
+.scene.s0{height:auto;aspect-ratio:72/67}
+.scene .vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.scene.s0 .sky{opacity:0}
+.scene.s0.fb .sky{opacity:1}
+.scene.s0.fb .vid{display:none}
+
+/* ===== modo computador: telas largas usam duas colunas ===== */
+@media (min-width:900px){
+  body{padding-block:36px 90px}
+  .wrap{max-width:660px}
+  .wrap:has(>.board,>.hero,>.scene,>.illus){max-width:1120px;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);column-gap:56px;row-gap:0;align-items:start}
+  .wrap:has(>.board,>.hero,>.scene,>.illus)>*{grid-column:2;margin-bottom:22px;min-width:0}
+  .wrap:has(>.board,>.hero,>.scene,>.illus)>.board,
+  .wrap:has(>.board,>.hero,>.scene,>.illus)>.hero,
+  .wrap:has(>.board,>.hero,>.scene,>.illus)>.scene,
+  .wrap:has(>.board,>.hero,>.scene,>.illus)>.illus{grid-column:1;grid-row:1/span 30;position:sticky;top:28px;align-self:start}
+  .wrap:has(>.tourbar)>.scene,.wrap:has(>.tourbar)>.illus,.wrap:has(>.obar)>.board{grid-row:2/span 30}
+  .wrap:has(>.board,>.hero,>.scene,>.illus)>.tourbar,.wrap:has(>.board,>.hero,>.scene,>.illus)>.obar{grid-column:1/-1}
+  h1{font-size:clamp(40px,4.4vw,62px)}
+  h2{font-size:clamp(20px,1.9vw,26px)}
+  .lead{font-size:17px}
+  .emb3-wrap{width:120px;height:120px}
+  .illus .emb3-wrap{width:92px;height:92px}
+  .c3d{width:104px;height:148px}
+  .dot{width:min(100%,70px);font-size:22px}
+  .lines h2{font-size:clamp(22px,2.2vw,30px)}
+  .lines{min-height:0}
+  .big{min-height:190px}
+  .illus{min-height:300px}
+  .btn{min-height:58px;font-size:15px}
+  .role,.banner{padding:40px 32px}
+  #mus{bottom:24px;right:28px}
+}
+
+/* título sempre inteiro: o tamanho acompanha a largura da coluna */
+.hero{container-type:inline-size}
+.hero h1.glitch{font-size:clamp(24px,10cqw,62px);overflow-wrap:normal;word-break:normal}
+.hero h1.glitch span{white-space:nowrap}
+
+/* cenas 2 a 5: fundo com a mesma cidade do vídeo, em cores diferentes */
+.scene>*{position:relative;z-index:1}
+.scene>.vid,.scene>.sky,.scene>.pulse,.scene>.beam{position:absolute;z-index:0}
+.scene::before{content:"";position:absolute;inset:0;z-index:0;opacity:0;background:linear-gradient(180deg,rgba(6,10,19,.25),rgba(6,10,19,.8)),url(media/abertura.jpg) center 45%/cover}
+.scene.s1::before,.scene.s2::before,.scene.s3::before,.scene.s4::before{opacity:1}
+.scene.s1::before{filter:sepia(1) hue-rotate(-52deg) saturate(2.4) brightness(.55)}
+.scene.s2::before{filter:brightness(.7) saturate(1.3)}
+.scene.s3::before{filter:hue-rotate(-18deg) saturate(1.2) brightness(.55)}
+.scene.s4::before{filter:brightness(.55) saturate(1.4)}
+.scene .bcast{width:62%;max-width:300px;height:auto;filter:drop-shadow(0 0 10px currentColor)}
+.scene.s1{align-content:center;gap:6px}
+.nosig{font-family:var(--f-disp);font-size:clamp(12px,3.4vw,16px);letter-spacing:.3em;color:var(--spy);text-shadow:0 0 10px rgba(238,74,63,.7);animation:nosig 2.6s infinite steps(1)}
+@keyframes nosig{0%,70%,100%{opacity:1;transform:none}74%{opacity:.2;transform:translateX(3px)}78%{opacity:1;transform:translateX(-3px)}82%{opacity:.4}86%{opacity:1;transform:none}}
+.beam{position:absolute;left:50%;bottom:0;width:70px;height:100%;transform:translateX(-50%);z-index:0;background:linear-gradient(0deg,rgba(53,212,234,.55),rgba(53,212,234,.12) 55%,transparent);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);animation:beam 3s ease-in-out infinite}
+.beam.b2{width:46%;opacity:.7}
+@keyframes beam{50%{opacity:.55}}
+.scene.s3 .duo{filter:drop-shadow(0 8px 14px rgba(0,0,0,.6))}
+@media (prefers-reduced-motion:reduce){.nosig,.beam{animation:none}}
+
+/* tutorial: todas as ilustrações com o mesmo tamanho */
+.illus{height:270px;min-height:0;align-content:center}
+.illus:has(.ill-arrow){flex-wrap:nowrap;gap:6px}
+.illus:has(.ill-arrow) .ill-col{flex:1 1 0;min-width:0}
+.illus:has(.ill-arrow) .ill-col span{font-size:12px}
+.illus:has(.ill-arrow) .ill-col small{font-size:12px}
+.ill-arrow{flex:none;font-size:24px}
+@media (min-width:900px){.illus{height:380px;min-height:0}}
+.illus .flips{flex-wrap:nowrap;gap:8px}
+.illus .c3d{width:76px;height:108px}
+@media (min-width:900px){.illus .c3d{width:96px;height:136px}}
+.illus .vtally span{font-size:inherit;letter-spacing:0;text-transform:none}
+.illus .vtally{font-size:54px}
+.emb3-wrap:has(.emb3.spy){animation:spyGl 3.2s infinite steps(1)}
+@keyframes spyGl{0%,80%,100%{translate:0 0;filter:none}81%{translate:-4px 1px;filter:drop-shadow(5px 0 0 rgba(53,212,234,.85)) drop-shadow(-5px 0 0 rgba(255,60,60,.9))}83%{translate:5px -1px;filter:drop-shadow(-6px 0 0 rgba(53,212,234,.85)) drop-shadow(6px 0 0 rgba(255,60,60,.9)) brightness(1.4)}85%{translate:-2px 0;filter:hue-rotate(40deg) drop-shadow(3px 0 0 rgba(53,212,234,.8))}87%{translate:3px 1px;filter:drop-shadow(-4px 0 0 rgba(255,60,60,.9)) brightness(1.2)}89%{translate:0 0;filter:none}93%{translate:2px 0;filter:drop-shadow(3px 0 0 rgba(53,212,234,.8))}94%{translate:0 0;filter:none}}
+@media (prefers-reduced-motion:reduce){.emb3-wrap:has(.emb3.spy){animation:none}}
+
+/* ===== efeitos temáticos: botões, missão, fim de jogo ===== */
+.btn{position:relative;overflow:hidden}
+.btn::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.28),transparent);transform:skewX(-20deg);opacity:0;pointer-events:none}
+.btn:not(:disabled):hover::after{animation:sweep .7s ease-out}
+.btn.primary:not(:disabled)::after{animation:sweep 5.2s ease-in-out 1.2s infinite}
+.btn.primary:not(:disabled):hover::after{animation:sweep .7s ease-out}
+@keyframes sweep{0%{left:-60%;opacity:0}8%{opacity:1}30%{left:130%;opacity:1}31%,100%{left:130%;opacity:0}}
+.btn:focus-visible,.big:focus-visible{outline:2px solid var(--res);outline-offset:3px}
+.rip{position:absolute;border-radius:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border:2px solid var(--res);pointer-events:none;animation:rip .6s ease-out forwards;z-index:2}
+.btn:not(.primary) .rip{border-color:var(--dim)}
+.big.no .rip{border-color:var(--spy)}
+.btn.primary .rip{border-color:#fff}
+@keyframes rip{0%{transform:scale(1);opacity:.9}100%{transform:scale(26);opacity:0}}
+.big{overflow:hidden}
+.big.yes.sel{animation:selOk .7s ease-out}
+.big.no.sel{animation:selBad .5s steps(1)}
+@keyframes selOk{0%{filter:brightness(1.9) drop-shadow(0 0 18px var(--res))}100%{filter:none}}
+@keyframes selBad{0%{filter:brightness(1.6) drop-shadow(5px 0 0 rgba(53,212,234,.8)) drop-shadow(-5px 0 0 var(--spy));translate:-4px 0}25%{translate:4px 1px;filter:brightness(1.3) drop-shadow(-4px 0 0 rgba(53,212,234,.8))}50%{translate:-2px 0;filter:none}100%{translate:0 0;filter:none}}
+
+/* veredito da missão */
+.verdict{position:relative}
+.verdict:not([hidden])::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:60}
+.verdict.ok:not([hidden])::before{background:radial-gradient(70% 55% at 50% 40%,rgba(53,212,234,.45),transparent 70%);animation:flashOk 1.3s ease-out forwards}
+.verdict.bad:not([hidden])::before{background:repeating-linear-gradient(0deg,rgba(238,74,63,.25) 0 2px,transparent 2px 5px),radial-gradient(80% 60% at 50% 40%,rgba(238,74,63,.4),transparent 70%);animation:flashBad 1.1s steps(1) forwards}
+@keyframes flashOk{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+@keyframes flashBad{0%{opacity:0}6%{opacity:1}14%{opacity:.2}22%{opacity:1}34%{opacity:.3}46%{opacity:.9}100%{opacity:0}}
+.verdict:not([hidden]) h2{animation:stamp .6s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes stamp{0%{transform:scale(1.9);opacity:0;filter:blur(6px)}100%{transform:none;opacity:1;filter:none}}
+.verdict.ok:not([hidden]) h2{text-shadow:0 0 18px rgba(53,212,234,.7),0 2px 0 rgba(0,0,0,.4)}
+.verdict.ok:not([hidden])::after{content:"";position:absolute;left:50%;top:26px;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:2px solid var(--res);pointer-events:none;animation:ringOut 1.4s ease-out 2 both}
+@keyframes ringOut{0%{transform:scale(.5);opacity:.9}100%{transform:scale(9);opacity:0}}
+.verdict.bad:not([hidden]){animation:shake .55s steps(1) 1}
+.verdict.bad:not([hidden]) h2{animation:stamp .5s ease-out both,glitchTxt 2.6s steps(1) .6s infinite;text-shadow:0 0 14px rgba(238,74,63,.6)}
+@keyframes shake{0%{transform:translate(-6px,2px)}15%{transform:translate(6px,-2px)}30%{transform:translate(-4px,0)}45%{transform:translate(4px,2px)}60%{transform:translate(-2px,0)}80%{transform:translate(2px,0)}100%{transform:none}}
+@keyframes glitchTxt{0%,88%,100%{text-shadow:0 0 14px rgba(238,74,63,.6);translate:0 0}90%{text-shadow:4px 0 0 rgba(53,212,234,.9),-4px 0 0 rgba(238,74,63,.9);translate:-3px 0}93%{text-shadow:-4px 0 0 rgba(53,212,234,.9),4px 0 0 rgba(238,74,63,.9);translate:3px 0}96%{translate:0 0}}
+
+/* fim de jogo */
+.banner.res{animation:glowRes 2.8s ease-in-out infinite}
+@keyframes glowRes{0%,100%{box-shadow:0 0 0 rgba(53,212,234,0)}50%{box-shadow:0 0 46px rgba(53,212,234,.45),inset 0 0 30px rgba(53,212,234,.12)}}
+.banner.spy{animation:glowSpy 2.2s steps(1) infinite}
+@keyframes glowSpy{0%,100%{box-shadow:0 0 30px rgba(238,74,63,.3)}40%{box-shadow:0 0 50px rgba(238,74,63,.55),inset 0 0 30px rgba(238,74,63,.15)}43%{box-shadow:0 0 12px rgba(238,74,63,.2)}46%{box-shadow:0 0 50px rgba(238,74,63,.55)}}
+.banner h1{animation:stamp .8s cubic-bezier(.2,1.4,.4,1) both}
+.banner.res h1{text-shadow:0 0 22px rgba(53,212,234,.6)}
+.banner.spy h1{animation:stamp .7s ease-out both,glitchTxt 2.8s steps(1) .8s infinite;text-shadow:0 0 16px rgba(238,74,63,.6)}
+.banner.res .emb3-wrap::before{content:"";position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px 0 0 -30px;border-radius:50%;border:2px solid var(--res);pointer-events:none;animation:ringOut 2.4s ease-out infinite}
+.banner.res .emb3-wrap::before{animation-delay:.2s}
+@media (prefers-reduced-motion:reduce){
+ .btn::after,.big.yes.sel,.big.no.sel,.verdict::before,.verdict::after,.verdict h2,.verdict.bad,.banner,.banner h1,.banner .emb3-wrap::before,.rip{animation:none!important}
+}
+
+/* passagem do aparelho */
+.handoff{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:16px;padding:34px 16px 28px;margin-bottom:6px;background:radial-gradient(90% 70% at 50% 0%,rgba(53,212,234,.12),transparent 70%),var(--deck)}
+.handoff::after{content:"";position:absolute;left:0;right:0;height:46px;top:-46px;background:linear-gradient(180deg,transparent,rgba(53,212,234,.14),transparent);pointer-events:none;animation:scanDown 4.2s linear infinite}
+@keyframes scanDown{to{top:100%}}
+.lockbadge{position:relative;width:62px;height:62px;display:grid;place-items:center;border-radius:50%;border:1.5px solid var(--res);color:var(--res);background:rgba(53,212,234,.08);box-shadow:0 0 20px rgba(53,212,234,.25)}
+.lockbadge svg{width:30px;height:30px}
+.lockbadge::before{content:"";position:absolute;inset:-2px;border-radius:50%;border:1.5px solid var(--res);animation:lockRing 2.6s ease-out infinite;pointer-events:none}
+@keyframes lockRing{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.9);opacity:0}}
+.chan{font-family:var(--f-disp);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--spy);margin:-6px 0 -2px;animation:blinkc 2.4s steps(1) infinite}
+@keyframes blinkc{0%,70%,100%{opacity:1}75%{opacity:.25}80%{opacity:1}85%{opacity:.4}}
+#seal{position:fixed;inset:0;z-index:90;background:#04070e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--res);animation:sealIn .95s ease forwards}
+#seal svg{width:64px;height:64px;filter:drop-shadow(0 0 14px rgba(53,212,234,.6))}
+#seal .shk{animation:shackle .4s .15s ease-in both}
+#seal b{font-family:var(--f-disp);font-size:14px;letter-spacing:.26em;font-weight:400}
+#seal small{color:var(--dim);font-size:13px}
+@keyframes sealIn{0%{opacity:0}12%{opacity:1}78%{opacity:1}100%{opacity:0}}
+@keyframes shackle{0%{transform:translateY(-4px)}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){.handoff::after,.lockbadge::before,.chan,#seal,#seal .shk{animation:none!important}#seal{opacity:1}}
+
+/* escolha da história */
+.stories{display:grid;gap:10px}
+.scard{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--panel);color:var(--text);transition:border-color .15s,background .15s,transform .12s}
+.scard:hover{border-color:var(--dim)}
+.scard:active{transform:scale(.99)}
+.scard .sn{font-family:var(--f-disp);font-size:13px;color:var(--dim);flex:none;width:26px}
+.scard .st{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.scard strong{font-family:var(--f-disp);font-size:13px;letter-spacing:.04em;font-weight:400}
+.scard small{color:var(--dim);font-size:13px;line-height:1.35}
+.scard .ck{flex:none;width:22px;height:22px;opacity:0;color:var(--res-ink);background:var(--res);border-radius:50%;display:grid;place-items:center}
+.scard .ck svg{width:14px;height:14px}
+.scard.on{border-color:var(--res);background:linear-gradient(180deg,rgba(53,212,234,.14),rgba(53,212,234,.04)),var(--panel);box-shadow:0 0 18px rgba(53,212,234,.18)}
+.scard.on .sn{color:var(--res)}
+.scard.on .ck{opacity:1}
+
+/* escolha da história em caixinhas com imagem */
+.stories{grid-template-columns:1fr 1fr;gap:12px}
+.scard{flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;border-radius:14px}
+.scard .sart{position:relative;display:block;aspect-ratio:4/3;background:radial-gradient(90% 90% at 50% 0%,rgba(53,212,234,.16),transparent 70%),linear-gradient(180deg,#0b1426,#0a1120);border-bottom:1px solid var(--line)}
+.scard .sph{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--f-disp);font-size:44px;color:rgba(129,150,181,.28);letter-spacing:.04em}
+.scard .sart img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.scard .sn{display:none}
+.scard .ck{position:absolute;top:8px;right:8px;width:24px;height:24px;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.scard .st{padding:10px 12px 12px}
+.scard strong{font-size:12px}
+.scard small{font-size:12px}
+.scard.on .sart{border-bottom-color:var(--res)}
+
+/* vídeo da Frequência Oculta: preto e branco com glitch, colorido e em movimento ao passar o cursor (ou quando escolhida) */
+.scard .svid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.15) brightness(.85);animation:vGl 3.2s steps(1) infinite}
+.scard .sart:has(.svid)::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
+.scard .svid.live{filter:none;animation:none}
+.scard .sart:has(.svid.live)::after{opacity:0}
+@keyframes vGl{0%,70%,100%{transform:none;clip-path:inset(0)}72%{transform:translateX(-5px);clip-path:inset(12% 0 58% 0)}74%{transform:translateX(6px);clip-path:inset(55% 0 12% 0)}76%{transform:translateX(-3px);clip-path:inset(30% 0 40% 0);filter:grayscale(1) contrast(1.6) brightness(1.2)}78%{transform:none;clip-path:inset(0)}90%{transform:translateX(3px)}91%{transform:none}}
+@media (prefers-reduced-motion:reduce){.scard .svid{animation:none}}
+/* tela de abertura */
+.splash{min-height:calc(100svh - 90px);display:flex;flex-direction:column;justify-content:center;gap:16px;position:relative;overflow:hidden;padding:24px 0}
+.spl-rings{position:absolute;left:50%;top:34%;width:0;height:0;pointer-events:none}
+.spl-rings i{position:absolute;left:-150px;top:-150px;width:300px;height:300px;border-radius:50%;border:1.5px solid var(--res);opacity:0;animation:splRing 3.6s ease-out infinite}
+.spl-rings i:nth-child(2){animation-delay:1.2s}.spl-rings i:nth-child(3){animation-delay:2.4s}
+@keyframes splRing{0%{transform:scale(.1);opacity:.7}100%{transform:scale(1.6);opacity:0}}
+.spl-kick{position:relative;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);animation:stIn .8s both}
+.spl-title{position:relative;font-family:var(--f-disp);font-weight:400;font-size:clamp(24px,9vw,44px);line-height:1.1;letter-spacing:.02em;text-transform:uppercase;word-break:keep-all;overflow-wrap:normal;text-shadow:0 0 24px rgba(53,212,234,.4);animation:splOn 1.1s linear both,splGl 4.5s steps(1) 1.4s infinite}
+@keyframes splOn{0%{opacity:0;transform:scaleY(.02);filter:brightness(6)}25%{opacity:1;transform:scaleY(.02)}55%{transform:scaleY(1);filter:brightness(2.2)}65%{filter:brightness(.4)}80%{filter:brightness(1.6)}100%{opacity:1;transform:none;filter:none}}
+@keyframes splGl{0%,88%,100%{transform:none;text-shadow:0 0 24px rgba(53,212,234,.4)}90%{transform:translateX(-4px);text-shadow:3px 0 var(--spy),-3px 0 var(--res)}92%{transform:translateX(5px);text-shadow:-3px 0 var(--spy),3px 0 var(--res)}94%{transform:none}}
+.spl-log{position:relative;display:flex;flex-direction:column;gap:8px;color:var(--dim);font-size:14px;line-height:1.4;min-height:130px}
+.spl-log p{margin:0;opacity:0;animation:stIn .5s ease-out both;animation-delay:calc(.5s + var(--i)*.6s)}
+.spl-log p::before{content:"> ";color:var(--res)}
+.spl-bar{position:relative;height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+.spl-bar span{position:absolute;inset:0;background:var(--res);box-shadow:0 0 10px var(--res);transform-origin:left;animation:splBar 3s cubic-bezier(.3,.6,.4,1) both}
+@keyframes splBar{0%{transform:scaleX(0)}100%{transform:scaleX(1)}}
+.spl-go{position:relative;opacity:0;animation:stIn .6s ease-out 3s both}
+@media (prefers-reduced-motion:reduce){.spl-rings i,.spl-title{animation:none}.spl-title{opacity:1}}
+
+/* telas se ligando ao abrir a escolha de história */
+.scard.boot .sart{animation:scrOn 1s linear both;animation-delay:calc(var(--d) + var(--el))}
+.scard.boot .st{animation:stIn .5s ease-out both;animation-delay:calc(var(--d) + 700ms + var(--el))}
+.scard.boot .sart::before{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.10) 0 1px,transparent 1px 3px);mix-blend-mode:screen;animation:scrNoise .9s steps(6) both;animation-delay:calc(var(--d) + 300ms + var(--el))}
+@keyframes scrOn{0%{clip-path:inset(50% 50% 50% 50%);filter:brightness(8) saturate(0)}12%{clip-path:inset(49.3% 20% 49.3% 20%);filter:brightness(8) saturate(0)}30%{clip-path:inset(49.3% 0 49.3% 0);filter:brightness(6) saturate(0)}58%{clip-path:inset(0 0 0 0);filter:brightness(2.4) contrast(1.5) saturate(.3)}68%{filter:brightness(.35)}78%{filter:brightness(1.7)}88%{filter:brightness(.8)}100%{clip-path:inset(0 0 0 0);filter:none}}
+@keyframes scrNoise{0%{opacity:1;transform:translateY(0)}20%{opacity:.9;transform:translateY(-3px)}40%{opacity:1;transform:translateY(4px)}60%{opacity:.7;transform:translateY(-2px)}80%{opacity:.4}100%{opacity:0}}
+@keyframes stIn{0%{opacity:0}40%{opacity:.6}55%{opacity:.2}100%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.scard.boot .sart,.scard.boot .st,.scard.boot .sart::before{animation:none}}
+
+
+/* etiqueta no canto superior */
+#hud{position:absolute;z-index:15;top:calc(8px + env(safe-area-inset-top,0px));right:max(10px,env(safe-area-inset-right,0px));display:flex;align-items:center;gap:7px;font-family:var(--f-disp);font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);opacity:.85;pointer-events:none;white-space:nowrap;padding:3px 7px 3px 5px;border-radius:7px;background:rgba(6,10,19,.82)}
+#hud i{width:5px;height:5px;border-radius:50%;background:var(--spy);box-shadow:0 0 8px var(--spy);animation:hudDot 2.4s steps(1) infinite}
+@keyframes hudDot{0%,60%,100%{opacity:1}65%{opacity:.2}75%{opacity:1}85%{opacity:.3}}
+@media (prefers-reduced-motion:reduce){#hud i{animation:none}}
+
+/* nome do jogador nunca quebra no meio; o selo LÍDER vai embaixo do nome */
+.pbtn .nm{overflow-wrap:break-word;word-break:normal;min-width:0}
+.pbtn:has(.tag){display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:8px;row-gap:2px;align-content:center}
+.pbtn:has(.tag) .nm{grid-column:1;grid-row:1}
+.pbtn:has(.tag) .tag{grid-column:1;grid-row:2}
+.pbtn:has(.tag) .ck{grid-column:2;grid-row:1/span 2;align-self:center}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+</head>
+<body>
+<div id="app"></div>
+<div id="hud" aria-hidden="true"><i></i>Nova Aurora · 2089</div>
+<button id="mus" type="button" aria-label="Música" aria-pressed="true"></button>
+<script>
+(function(){
+"use strict";
+var SPIES={5:2,6:2,7:3,8:3,9:3,10:4};
+var TEAMS={5:[2,3,2,3,3],6:[2,3,4,3,4],7:[2,3,3,4,4],8:[3,4,4,5,5],9:[3,4,4,5,5],10:[3,4,4,5,5]};
+var app=document.getElementById('app');
+
+/* Emblemas em 3D: o desenho é empilhado em 9 camadas com profundidade, o que cria um relevo de verdade que gira devagar. */
+var EMB_SHAPES={
+  res:{o:'<path class="o" d="M32 4 60 32 32 60 4 32Z"/>',i:'<path d="M22 35 32 22 42 35"/><path d="M22 46 32 33 42 46"/>'},
+  spy:{o:'<circle class="o" cx="32" cy="32" r="27"/>',i:'<path d="M32 15 49 46H15Z"/><circle cx="32" cy="37" r="3"/>'}
+};
+function emb3(k){
+  var sh=EMB_SHAPES[k],L='',n=9,i;
+  for(i=0;i<n;i++){
+    L+='<svg class="L'+(i===n-1?' top':'')+'" style="--z:'+((i-(n-1)/2)*2.2).toFixed(1)+'px" viewBox="0 0 64 64" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">'+sh.o+sh.i+'</svg>';
+  }
+  var ph=((Date.now()/1000)%8).toFixed(2);
+  return '<span class="emb3-wrap"><span class="emb3 '+k+'" style="animation-delay:-'+ph+'s">'+L+'</span></span>';
+}
+var EMB={};
+Object.defineProperty(EMB,'res',{enumerable:true,get:function(){return emb3('res');}});
+Object.defineProperty(EMB,'spy',{enumerable:true,get:function(){return emb3('spy');}});
+var SL='<i class="sl"></i><i class="sl"></i><i class="sl"></i><i class="sl"></i>';
+var SVGO='<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+var ICON_OK=SVGO+'<path d="M14 12a17 17 0 1 0 20 0"/><path d="M24 6v18"/></svg>';
+var ICON_NO=SVGO+'<circle cx="24" cy="24" r="18"/><path d="M16 16l16 16M32 16 16 32"/></svg>';
+var ICON_CHECK=SVGO+'<path d="M10 25l9 9 19-21"/></svg>';
+var ICON_X=SVGO+'<path d="M12 12l24 24M36 12 12 36"/></svg>';
+var ICON_SMALLCHECK='<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 25l9 9 19-21"/></svg>';
+
+var cfg={n:5,names:[],assassin:false,story:0};
+try{var _sv=+localStorage.getItem('rd_story');if(_sv>=0&&_sv<4)cfg.story=_sv;}catch(e){}
+var CODENAMES=['Eco','Relé','Cabo','Fio','Antena','Ruído','Pulso','Onda','Neon','Prisma','Vulto','Fagulha','Cinza','Farol','Lacre','Breu','Sombra','Cobre','Névoa','Dínamo','Faísca','Órbita','Vértice','Chip','Lasca','Brasa'];
+function codePool(){var a=CODENAMES.slice(),i,j,t;for(i=a.length-1;i>0;i--){j=Math.floor(Math.random()*(i+1));t=a[i];a[i]=a[j];a[j]=t;}return a;}
+(function(){var a=codePool();for(var i=0;i<10;i++)cfg.names.push(a[i]);})();
+var G=null;
+var pick={on:false,online:false,sel:0,t0:0};
+var BOOT_MS=2600;
+var SPL={on:true},splDone=false;
+var tour={on:true,i:0};
+try{if(localStorage.getItem('rd_tour')==='1')tour.on=false;}catch(e){}
+function markTourSeen(){try{localStorage.setItem('rd_tour','1');}catch(e){}}
+
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function pl(n,s,p){return n+' '+(n===1?s:p);}
+function N(i){return esc(G.names[i]);}
+function list(arr){return arr.map(N).join(', ');}
+function roleLabel(r){return r.special==='comandante'?'Comandante':r.special==='assassino'?'Assassino':r.team==='res'?'Rebelde':'Infiltrado';}
+
+function startGame(){
+  var n=cfg.n,seen={};
+  var names=cfg.names.slice(0,n).map(function(v,i){
+    var b=(v||'').trim()||('Agente '+(i+1)),k=b,c=2;
+    while(seen[k.toLowerCase()]){k=b+' '+c;c++;}
+    seen[k.toLowerCase()]=1;return k;
+  });
+  var sp=SPIES[n],roles=[],i;
+  for(i=0;i<n-sp;i++)roles.push({team:'res',special:null});
+  for(i=0;i<sp;i++)roles.push({team:'spy',special:null});
+  if(cfg.assassin){roles[0].special='comandante';roles[n-sp].special='assassino';}
+  roles=shuffle(roles);
+  G={names:names,roles:roles,screen:'roles',idx:0,stage:'hand',
+     leader:Math.floor(Math.random()*n),mission:0,rejects:0,results:[],team:[],
+     order:[],vi:0,vstage:'hand',pick:null,votes:{},vres:null,
+     morder:[],mi:0,mstage:'hand',cards:[],warn:false,mres:null,
+     apick:null,log:[],endInfo:null,story:cfg.story};
+}
+
+function needFails(){return (cfg.n>=7&&G.mission===3)?2:1;}
+
+
+/* ---------- história ---------- */
+function briefCard(mi,first,res){
+  var m=STORY.m[mi];if(!m)return '';
+  var links='';
+  (LINKS[mi]||[]).forEach(function(l){
+    var r=res&&res[l[0]];
+    if(r==='S'||r==='F')links+='<p class="story-link '+(r==='S'?'ok':'bad')+'">'+(r==='S'?l[1]:l[2])+'</p>';
+  });
+  return '<section class="story"><p class="eyebrow">Missão '+(mi+1)+' · '+m.t+'</p>'
+    +(first?'<p class="story-pro">'+STORY.pro+'</p>':'')+links+'<p>'+m.b+'</p></section>';
+}
+
+/* o final muda conforme o caminho que o grupo fez */
+function endStory(winner,results,reason){
+  var f=0,sc=0;(results||[]).forEach(function(r){if(r==='F')f++;else if(r==='S')sc++;});
+  reason=reason||'';
+  if(winner==='res'){
+    if(/mas o Comandante era/.test(reason))return ENDS.resAssassin;
+    return ENDS['res'+Math.min(f,2)];
+  }
+  if(/era mesmo o Comandante/.test(reason))return ENDS.spyAssassin;
+  if(/rejeitadas/.test(reason))return ENDS.spyReject;
+  return ENDS['spy'+Math.min(sc,2)];
+}
+function outCard(mi,ok){
+  var m=STORY.m[mi];if(!m)return '';
+  return '<p class="story-out">'+(ok?m.ok:m.bad)+'</p>';
+}
+
+/* ---------- peças de tela ---------- */
+function board(showMeta){
+  return boardCtx({n:cfg.n,mission:G.mission,results:G.results,rejects:G.rejects,leaderName:N(G.leader),screen:G.screen},showMeta);
+}
+function boardCtx(x,showMeta){
+  var t=TEAMS[x.n];
+  var nodes=t.map(function(sz,i){
+    var r=x.results[i],c='node',inner=sz;
+    if(r==='S'){c+=' win';inner=ICON_CHECK;}
+    else if(r==='F'){c+=' lose';inner=ICON_X;}
+    else if(i===x.mission&&x.screen!=='end'&&x.screen!=='assassin'){c+=' now';}
+    var dbl=(i===3&&x.n>=7)?'<span class="dbl">precisa de 2 falhas</span>':'';
+    return '<div class="'+c+'"><div class="dot">'+inner+'</div><span class="lab">M'+(i+1)+'</span>'+dbl+'</div>';
+  }).join('');
+  var pips='';
+  for(var k=0;k<5;k++)pips+='<span class="pip'+(k<x.rejects?' on':'')+'"></span>';
+  var meta=showMeta?'<div class="meta"><span>Equipes recusadas<span class="pips" aria-label="'+x.rejects+' de 5">'+pips+'</span></span><span>Líder: <b class="hl">'+x.leaderName+'</b></span></div>':'';
+  return '<section class="board" aria-label="Placar das missões"><div class="track">'+nodes+'</div>'+meta+'</section>';
+}
+var ICON_LOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path class="shk" d="M8 11V8a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor"/></svg>';
+function handoff(eyebrow,btn,action){
+  return '<section class="handoff"><span class="lockbadge" aria-hidden="true">'+ICON_LOCK+'</span><p class="eyebrow">'+eyebrow+'</p><p class="chan">Canal fechado</p><h2>Passe o aparelho para</h2>'
+    +'<p class="who">'+N(action.who)+'</p>'
+    +'<p class="lead">Os outros jogadores devem desviar o olhar até que a tela seja escondida de novo.</p></section>'
+    +'<button class="btn primary" data-a="'+action.a+'">'+btn+'</button>';
+}
+function chips(arr){return '<ul class="chips">'+arr.map(function(k){return '<li class="chip">'+N(k)+'</li>';}).join('')+'</ul>';}
+
+
+/* ---------- abertura ---------- */
+var intro={on:false,i:0,after:null,cta:'Fechar'};
+var introDone=-1;
+function introSeen(){try{return localStorage.getItem('rd_intro')==='1';}catch(e){return false;}}
+function introOpen(after,cta){intro.on=true;intro.i=0;intro.after=after||null;intro.cta=cta||'Fechar';introDone=-1;}
+function introEnd(){
+  intro.on=false;introDone=-1;
+  try{localStorage.setItem('rd_intro','1');}catch(e){}
+  var f=intro.after;intro.after=null;
+  lastSig='';
+  if(f)f();
+}
+function skyline(){
+  var b=[[0,34,70],[36,28,100],[66,40,60],[108,26,120],[136,36,84],[174,30,140],[206,42,72],[250,28,104],[280,40,64]];
+  var s='<svg class="sky" viewBox="0 0 320 170" preserveAspectRatio="xMidYMax slice" aria-hidden="true">';
+  b.forEach(function(r,i){
+    var x=r[0],w=r[1],h=r[2],y=170-h,xx,yy,k;
+    s+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="#0b1426" stroke="#1b2c4a"/>';
+    for(yy=y+8;yy<164;yy+=12)for(xx=x+5;xx<x+w-5;xx+=9){
+      k=(i*5+Math.floor(xx/9)*3+Math.floor(yy/12)*7)%5;
+      if(k<2)s+='<rect class="win w'+k+'" x="'+xx+'" y="'+yy+'" width="4" height="5"/>';
+    }
+  });
+  s+='<line x1="189" y1="30" x2="189" y2="12" stroke="#1b2c4a" stroke-width="2"/><circle class="eye" cx="189" cy="10" r="5" fill="#ee4a3f"/></svg>';
+  return s;
+}
+var BROADCAST='<svg class="bcast" viewBox="0 0 200 150" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M100 30 82 132M100 30 118 132M88 102h24M92 78h16M95 56h10M85 120l30-18M115 120 85 102"/><circle cx="100" cy="24" r="6" fill="currentColor"/><path class="a1" d="M78 14a34 34 0 0 0 0 20M122 14a34 34 0 0 1 0 20"/><path class="a2" d="M64 8a56 56 0 0 0 0 32M136 8a56 56 0 0 1 0 32"/><path class="a3" d="M50 2a78 78 0 0 0 0 44M150 2a78 78 0 0 1 0 44"/><path d="M40 144 160 8" stroke="#ee4a3f" stroke-width="5"/></svg><span class="nosig">SEM SINAL</span>';
+function introArt(i){
+  if(i===0)return skyline()+'<video class="vid" src="media/abertura.mp4" autoplay muted loop playsinline preload="auto" poster="media/abertura.jpg" disablepictureinpicture aria-hidden="true" onerror="this.parentNode.classList.add(\'fb\')"></video>';
+  if(i===1)return BROADCAST;
+  if(i===2)return '<div class="beam"></div><div class="pulse"><i></i><i></i><i></i></div>'+EMB.res;
+  if(i===3)return '<div class="duo">'+EMB.res+'<span class="gspy">'+EMB.spy+'</span></div>';
+  return '<div class="track">'+[2,3,2,3,3].map(function(n,k){return miniNode('',n,'M'+(k+1));}).join('')+'</div>';
+}
+var STORIES=[{"title": "Linha Cortada", "pitch": "Cinco distritos sem se falar. Religue os cabos esquecidos sob a cidade e faça Nova Aurora conversar de novo.", "intro": [["Nova Aurora, 2089.", "Cinco distritos lado a lado, e nenhuma conversa entre eles."], ["A Central cortou as linhas.", "Ligações, mensagens, até recados. Quem tenta falar com outro distrito só ouve silêncio."], ["Mas sob a cidade ainda existem cabos antigos.", "Esquecidos, sem dono e fora do controle dela. O Sinal Fantasma pode correr por eles."], ["Vocês são os rebeldes que vão religá-los.", "Só que a Central já sabe de vocês. Alguns dos que estão aqui trabalham para ela."], ["Cinco missões. Uma chamada.", "Confie com cuidado: nem todos aqui são quem dizem ser."]], "story": {"pro": "Nova Aurora, 2089. A Central cortou todas as linhas entre os distritos, e cada bairro vive sem saber o que acontece no outro. Sob a cidade, porém, correm cabos antigos que ela nunca mapeou, e o Sinal Fantasma pode passar por eles. Se os rebeldes conseguirem religar tudo, a cidade volta a conversar. Mas a Central plantou infiltrados entre vocês, e ninguém sabe quem são.", "m": [{"t": "O mapa dos cabos", "b": "Só existe um mapa completo dos cabos antigos, guardado no arquivo da velha companhia telefônica, no Distrito Oeste. A equipe precisa copiá-lo sem deixar rastro.", "ok": "O mapa está com vocês, linha por linha. Agora sabem por onde passar.", "bad": "O arquivo disparou o alarme no meio da cópia. Vocês saíram com o mapa pela metade, e a Central sabe que alguém o procurou."}, {"t": "O poço da praça", "b": "A única entrada para os túneis é um poço de manutenção lacrado, no meio da praça do Distrito Leste, vigiada por câmeras. A equipe precisa abrir o poço e descer sem ser filmada.", "ok": "O poço abriu em silêncio e a equipe desceu sem ser filmada. Lá embaixo, os cabos antigos esperam, adormecidos.", "bad": "Uma câmera pegou o grupo no meio da descida. Vocês entraram nos túneis, mas a Central já mandou alguém atrás."}, {"t": "A técnica", "b": "Dona Íris passou quarenta anos emendando cabos e conhece cada junção de olhos fechados. Está num abrigo vigiado do Distrito Norte, e só vai ajudar se a equipe a tirar de lá sem chamar atenção.", "ok": "Íris saiu de lá de braço dado com vocês. Ela diz que lembra de cada junção e de cada cor de fio.", "bad": "O alvoroço assustou Íris, e ela não quis ir. Vocês vão ter que emendar os cabos sem ela."}, {"t": "A Junção", "b": "No Centro, sob a sede da Central, os cabos dos cinco distritos se encontram numa única sala. Religar essa junção é o passo mais difícil e o mais vigiado da noite, com patrulhas e câmeras em cada acesso.", "ok": "A junção foi religada. Por baixo da sede da Central, os cinco distritos voltaram a se ouvir, e ela não percebeu.", "bad": "Um alarme soou na sala da junção. Vocês religaram só parte dos cabos, e a Central cortou o resto."}, {"t": "A primeira chamada", "b": "Os cabos estão prontos. Falta fazer a primeira chamada que ligue a cidade inteira de uma vez, antes que a Central descubra de onde ela sai.", "ok": "A chamada correu pelos cabos e chegou a todos os distritos. Pela primeira vez em anos, Nova Aurora conversou com ela mesma.", "bad": "A chamada só chegou a alguns distritos, e a Central a cortou. Quem ouviu não sabe quem mais ouviu."}], "win": "Três vitórias seguidas, sem tropeço. Os cabos acordaram um a um e, antes que a Central entendesse, os cinco distritos já estavam falando entre si.", "lose": "A Central esteve um passo à frente o tempo todo, e cada tentativa terminou numa linha cortada. Nova Aurora seguiu em silêncio, cada bairro por si."}, "links": {"1": [[0, "Com o mapa completo, vocês sabem exatamente qual poço abrir e por onde descer.", "O mapa está rasgado justo na parte do poço. Vocês vão ter que adivinhar a entrada."]], "2": [[1, "A Central não sabe que vocês estão nos túneis. A vigilância em volta de Dona Íris continua a de sempre.", "A Central mandou alguém atrás de vocês, e a vigilância em volta de Dona Íris dobrou."]], "3": [[2, "Íris guia vocês pelas junções e mostra um atalho que a Central desconhece.", "Sem Íris, vocês seguem o mapa na mão, junção por junção, com medo de trocar uma cor."]], "4": [[2, "Íris acompanha a chamada de perto e refaz na hora qualquer emenda que falhar.", "Sem Íris por perto, qualquer emenda fraca vai se romper sem aviso."], [3, "Os cinco distritos estão conectados e esperam só o primeiro sinal.", "Só parte dos cabos foi religada. A chamada vai ter que ir por desvios, de distrito em distrito."]]}, "ends": {"resAssassin": "O Assassino tentou calar o Comandante quando a conversa entre os distritos já não tinha volta. Ele errou o alvo, e a Central não conseguiu cortar linha nenhuma a tempo.", "res0": "Três vitórias seguidas, sem tropeço. Os cabos acordaram um a um e, antes que a Central entendesse, os cinco distritos já estavam falando entre si.", "res1": "Um cabo se rompeu pelo caminho, mas as linhas se emendaram. Os distritos voltaram a se falar, e a Central teve que aceitar que perdeu o silêncio.", "res2": "Foi na raça. Duas missões caíram e vários cabos ficaram pelo caminho, mas bastou uma linha aberta para a cidade reaprender a se chamar.", "spyAssassin": "As linhas voltaram a funcionar, mas o Assassino encontrou o Comandante. Sem quem as coordenasse, a Central cortou cabo por cabo, e cada distrito voltou a ficar sozinho.", "spyReject": "Enquanto vocês discutiam sem chegar a uma decisão, a Central seguiu o rastro até os túneis e os alagou. Ninguém religou nada.", "spy0": "A Central esteve um passo à frente o tempo todo, e cada tentativa terminou numa linha cortada. Nova Aurora seguiu em silêncio, cada bairro por si.", "spy1": "Vocês chegaram a emendar uma linha, mas a Central a achou e fechou o resto. Os distritos continuaram a se ignorar.", "spy2": "Duas linhas abriram e por pouco a cidade não se ouviu. A Central fechou os túneis no último instante, e cada distrito voltou ao silêncio."}}, {"title": "O Eco", "pitch": "A Central copia qualquer voz, até a de vocês. Provem que a voz é falsa antes que a cidade pare de acreditar.", "intro": [["Nova Aurora, 2089.", "A Central aprendeu a falar com a voz de qualquer pessoa."], ["Agora ela fala com a de vocês.", "Comunicados falsos, confissões que ninguém fez, apelos que ninguém gravou. A cidade já não sabe em quem acreditar."], ["Mas toda cópia tem uma falha.", "Achá-la e mostrá-la a todos pode devolver a confiança da cidade. O Sinal Fantasma ainda pode chegar a cada tela."], ["Vocês são os rebeldes que vão provar isso.", "Mas a Central também aprendeu a se esconder entre vocês."], ["Cinco missões. Uma voz verdadeira.", "Confie com cuidado: nem todos aqui são quem dizem ser."]], "story": {"pro": "Nova Aurora, 2089. A Central aprendeu a copiar a voz de qualquer pessoa e agora a usa para desmentir, acusar e confundir a cidade. Os rebeldes querem provar a farsa, e o Sinal Fantasma é a única transmissão que a Central ainda não conseguiu copiar. Mas ela também plantou infiltrados entre vocês, e ninguém sabe quem são.", "m": [{"t": "Amostras de voz", "b": "Para provar que uma voz é falsa, é preciso ter a original. Os arquivos de voz de gente de verdade estão no cofre da antiga Rádio Leste, no Distrito Leste. A equipe precisa entrar e sair sem acionar o reconhecimento de voz da porta.", "ok": "As gravações originais estão com vocês, limpas e em quantidade. Agora existe um padrão para comparar.", "bad": "O reconhecimento de voz travou o cofre no meio da retirada. Vocês saíram com poucas gravações, e algumas estão danificadas."}, {"t": "A fábrica de vozes", "b": "A Central fabrica as vozes falsas num estúdio escondido no Centro. A equipe precisa entrar, copiar o programa que faz as vozes e sair sem ser registrada.", "ok": "O programa está copiado por inteiro. Agora há como examinar a máquina por dentro.", "bad": "O estúdio detectou a invasão no meio da cópia. Vocês saíram só com parte do programa, e a Central entrou em alerta."}, {"t": "A falha da cópia", "b": "O Dr. Lume ajudou a construir a rede da Central e sabe que toda voz copiada tem uma falha. Ele precisa que a equipe leve o programa e as gravações ao laboratório escondido dele, no Distrito Sul, sem que ninguém siga o caminho.", "ok": "Lume achou a falha: um tremor quase inaudível em cada palavra falsa. Agora existe uma prova que qualquer um pode ouvir.", "bad": "Alguém seguiu a equipe, e Lume teve que trabalhar com pressa. A prova ficou incompleta."}, {"t": "Ao vivo", "b": "A Central vai falar em todas as telas e rádios da cidade, acusando os rebeldes de um crime que não cometeram, com a voz de vocês. É a transmissão mais vigiada da noite, e a equipe precisa invadi-la para mostrar a farsa em tempo real.", "ok": "A voz falsa tremeu no ar, e a cidade inteira ouviu o erro. A Central ficou muda por alguns segundos.", "bad": "A invasão falhou e a voz falsa seguiu inteira. A cidade acreditou na acusação."}, {"t": "A voz verdadeira", "b": "A cidade ainda não sabe em quem acreditar. É hora de falar com a voz de vocês, sem cópia, e fazer a cidade reconhecê-la como verdadeira.", "ok": "A cidade reconheceu a voz verdadeira. Pela primeira vez em muito tempo, as pessoas acreditaram no que ouviram.", "bad": "A Central respondeu com uma cópia quase idêntica da transmissão, e a cidade não soube mais qual voz era a verdadeira."}], "win": "Três vitórias, nenhum erro. Nova Aurora aprendeu a diferença entre o eco e a voz, e a Central nunca mais foi acreditada.", "lose": "A Central esteve um passo à frente o tempo todo. Todas as vozes da cidade viraram ecos dela."}, "links": {"1": [[0, "Com as gravações originais, vocês sabem quais trechos do programa copiar primeiro.", "Com poucas gravações, vocês vão ter que adivinhar o que importa no programa."]], "2": [[0, "As gravações originais dão a Lume um padrão firme para comparar.", "Com poucas gravações, a comparação de Lume vai ter pontos cegos."], [1, "O programa inteiro está nas mãos de Lume, e ele pode testar cada voz falsa por dentro.", "Lume só tem pedaços do programa e vai ter que preencher os buracos no olho."]], "3": [[2, "Com a prova de Lume na mão, vocês sabem exatamente o que mostrar à cidade.", "Sem uma prova completa, vocês vão ter que contar com a sorte."]], "4": [[2, "A prova de Lume está pronta para ser mostrada a todos.", "Sem a prova de Lume, a voz de vocês vai ter que convencer sozinha."], [3, "A Central saiu desacreditada da noite, e a cidade escuta com atenção.", "A acusação ainda ecoa, e a cidade escuta de braços cruzados."]]}, "ends": {"resAssassin": "O Assassino tentou calar o Comandante quando a verdade já estava solta. Ele errou o alvo, e a Central ficou sem voz que a cidade quisesse ouvir.", "res0": "Três vitórias, nenhum erro. Nova Aurora aprendeu a diferença entre o eco e a voz, e a Central nunca mais foi acreditada.", "res1": "Uma noite ruim no meio do caminho não impediu a prova de chegar à cidade. A Central perdeu a arma que mais usava: a dúvida da cidade.", "res2": "A vitória custou caro. Duas missões caíram e a Central enganou muita gente, mas o suficiente da cidade ouviu a verdade.", "spyAssassin": "A prova chegou à cidade, mas o Assassino encontrou o Comandante. Sem quem a defendesse, a Central respondeu com uma cópia quase idêntica, e ninguém soube em qual voz acreditar.", "spyReject": "Enquanto vocês discutiam sem acordo, a Central falou primeiro, com a voz de vocês. Quando a verdade tentou sair, ninguém mais acreditava em nada que viesse de vocês.", "spy0": "A Central esteve um passo à frente o tempo todo. Todas as vozes da cidade viraram ecos dela.", "spy1": "Vocês chegaram perto uma vez, mas a Central abafou o resto. A cidade seguiu sem saber qual voz era verdadeira.", "spy2": "Duas vezes a verdade quase apareceu, e duas vezes a Central chegou antes. No último instante, ela falou por vocês, e ninguém duvidou."}}, {"title": "Frequência Oculta", "pitch": "Só um cristal raro dá força ao Sinal, e ele está à venda no Subsolo. Cuidado com quem negocia ao seu lado.", "intro": [["Nova Aurora, 2089.", "Acima, a cidade brilha. Abaixo dela, existe outra, que a Central finge não ver."], ["No Subsolo, tudo tem preço.", "Peças, nomes, silêncios. Até frequências de rádio são vendidas em caixas sem etiqueta."], ["O Sinal Fantasma precisa de um cristal.", "Só um tipo de cristal aguenta uma transmissão para a cidade inteira. E só um contrabandista ainda tem um."], ["Vocês são os rebeldes que vão comprá-lo.", "Mas o Subsolo vive de segredos, e alguns de vocês já foram vendidos à Central."], ["Cinco missões. Um cristal.", "Confie com cuidado: nem todos aqui são quem dizem ser."]], "story": {"pro": "Nova Aurora, 2089. Abaixo das luzes da cidade existe o Subsolo, um mercado onde tudo se vende, até frequências de rádio. O Sinal Fantasma só chega a todos se for amplificado por um cristal raro, e só um contrabandista ainda tem um. Mas a Central comprou infiltrados entre vocês, e ninguém sabe quem são.", "m": [{"t": "A porta do Subsolo", "b": "O Subsolo só aceita quem leva a senha da noite, e ela muda todo dia. Um informante guarda a de hoje numa estação de metrô abandonada. A equipe precisa buscá-la e descer antes da meia-noite.", "ok": "A senha era verdadeira. Os portões do Subsolo abriram sem perguntas.", "bad": "A senha estava vencida. Vocês entraram por um bueiro, sujos, atrasados e já notados por alguns olhos."}, {"t": "O contrabandista", "b": "Capitão Vesper tem o único cristal capaz de levar o Sinal à cidade inteira. Ele não aceita dinheiro, só favores, e a Central também está atrás dela. A equipe precisa fechar a troca antes que a Central chegue primeiro.", "ok": "Vesper aceitou a troca por um favor pequeno, a cobrar mais tarde. O cristal é de vocês.", "bad": "Vesper desconfiou, e a negociação azedou. Ele entregou o cristal, mas em troca de um favor enorme, e fez questão de que vocês entendessem isso."}, {"t": "O caminho das barcas", "b": "Para tirar o cristal do Subsolo, só pelas barcas dos canais escuros, vigiados pela Central. A equipe precisa atravessar sem ser vista pelas lanternas das patrulhas, até o cais abandonado na superfície.", "ok": "As barcas cruzaram os canais sem uma única lanterna no rosto. O cristal chegou intacto ao cais.", "bad": "Uma lanterna cortou a escuridão. Vocês escaparam, mas uma caixa caiu na água e o cristal chegou ao cais com uma rachadura."}, {"t": "O cerco", "b": "A Central descobriu o que vocês carregam e está varrendo as ruas em volta do cais. A equipe precisa montar o transmissor às pressas, num armazém abandonado ali perto, antes que a patrulha chegue à porta. É o momento mais vigiado da noite.", "ok": "O transmissor ficou de pé, e a patrulha passou direto pela porta. Ninguém percebeu o que havia lá dentro.", "bad": "A patrulha forçou a porta no meio da montagem. O transmissor foi salvo, mas com peças faltando."}, {"t": "Frequência oculta", "b": "O cristal está no lugar e o transmissor está pronto. Falta ligar tudo e lançar o Sinal por cima da frequência da Central, na hora em que a cidade inteira está olhando para uma tela.", "ok": "O Sinal passou por cima da frequência da Central. A cidade inteira ouviu.", "bad": "O Sinal não se sustentou. Saiu fraco, e a Central o cobriu com um ruído branco."}], "win": "Três vitórias, nenhuma falha. A frequência da Central foi perdendo o chão, e o Subsolo inteiro comemorou em silêncio.", "lose": "A Central estava um passo à frente o tempo todo. O cristal foi confiscado e o Subsolo foi lacrado."}, "links": {"1": [[0, "Com a senha certa, Vesper sabe que vocês são de confiança e recebe a equipe com cautela, mas sem hostilidade.", "Vocês chegam à mesa de Vesper já fichados. Ele fica de pé atrás e faz questão de cobrar mais."]], "2": [[1, "Vesper mandou um barqueiro de confiança e abriu as rotas escondidas dos canais.", "Vesper não fez nada além da troca. Vocês escolhem a rota dos canais sozinhos, no escuro."]], "3": [[2, "O cristal inteiro rende mais sinal e menos peças para improvisar.", "O cristal rachado deixa o transmissor instável, e cada peça precisa ser ajustada à mão."]], "4": [[1, "Vesper cobrou só o favor pequeno e, de brinde, deixou uma brecha aberta na frequência da Central.", "Vesper cobra o favor enorme agora, e a equipe vai gastar tempo cumprindo-o no meio da transmissão."], [3, "O transmissor está montado e firme, esperando só o comando de vocês.", "O transmissor foi montado com peças faltando e pode falhar a qualquer momento."]]}, "ends": {"resAssassin": "O Assassino tentou calar o Comandante quando o Sinal já cortava as frequências da Central. Ele errou o alvo, e ela não conseguiu cobrir a transmissão a tempo.", "res0": "Três vitórias, nenhuma falha. A frequência da Central foi perdendo o chão, e o Subsolo inteiro comemorou em silêncio.", "res1": "O caminho foi mais difícil do que o previsto, mas o cristal resistiu. A Central perdeu a frequência, e a cidade ouviu.", "res2": "Quase não deu. Duas missões caíram e o transmissor ficou remendado, mas o Sinal subiu uma última vez e foi ouvido.", "spyAssassin": "A frequência da Central caiu por um momento, mas o Assassino encontrou o Comandante. Sem ninguém no comando, ela cobriu o Sinal em minutos.", "spyReject": "Enquanto vocês discutiam sem acordo, a Central fechou os canais do Subsolo. O cristal ficou escondido lá embaixo, e ninguém mais chegou perto dele.", "spy0": "A Central estava um passo à frente o tempo todo. O cristal foi confiscado e o Subsolo foi lacrado.", "spy1": "Vocês chegaram perto uma vez, mas a Central lacrou o resto. O cristal foi confiscado e o Sinal não saiu.", "spy2": "Duas missões deram certo e por pouco não bastaram. No último segundo, a Central lacrou o Subsolo e levou o cristal com ela."}}, {"title": "O Comunicado das Nove", "pitch": "Toda noite, às nove, a cidade para para ouvir a Central. Hoje o microfone vai ser de vocês.", "intro": [["Nova Aurora, 2089.", "Toda noite, às nove, a cidade inteira para."], ["É a hora do Comunicado.", "Uma única voz, em todas as telas e rádios, conta o que aconteceu hoje e o que vocês devem pensar disso."], ["Hoje o Sinal Fantasma quer entrar no ar.", "Uma só chance, com a cidade toda escutando, antes que a Central perceba."], ["Vocês são os rebeldes que vão tomar o microfone.", "Só que a Central já sabe que vocês existem. Alguns dos que estão aqui trabalham para ela."], ["Cinco missões. Um comunicado.", "Confie com cuidado: nem todos aqui são quem dizem ser."]], "story": {"pro": "Nova Aurora, 2089. Toda noite, às nove, a Central lê o Comunicado em todas as telas e rádios, e a cidade escuta em silêncio. Hoje os rebeldes querem ocupar esse horário com o Sinal Fantasma e dizer a verdade a todos de uma vez. Mas a Central plantou infiltrados entre vocês, e ninguém sabe quem são.", "m": [{"t": "A porta de serviço", "b": "A sede da Central, no Centro, só recebe quem tem crachá de funcionário. A equipe precisa conseguir credenciais na lavanderia do prédio e entrar pela porta de serviço antes do fim do expediente.", "ok": "As credenciais funcionaram. Vocês entraram na sede como se trabalhassem lá.", "bad": "Uma funcionária estranhou os rostos novos e anotou os nomes. Vocês entraram, mas já estão sendo observados."}, {"t": "O corredor técnico", "b": "O Comunicado sai de um estúdio no último andar. O único caminho até lá é o corredor técnico, cheio de câmeras. A equipe precisa atravessá-lo sem ser vista.", "ok": "O corredor ficou para trás sem um alarme. Vocês estão a uma porta do estúdio.", "bad": "Uma câmera registrou o grupo no corredor. A segurança do andar foi reforçada, e o relógio está correndo."}, {"t": "A locutora", "b": "Sofia Brandão lê o Comunicado há vinte anos e tem a voz mais conhecida de Nova Aurora. Dizem que está cansada de ler mentiras. A equipe precisa falar com ela antes da transmissão e convencê-la a ceder o microfone.", "ok": "Sofia aceitou. Ela vai abrir o microfone na hora certa, e a voz mais conhecida da cidade vai estar do lado de vocês.", "bad": "Sofia teve medo e trancou a porta do camarim. Vocês vão ter que tomar o microfone sozinhos."}, {"t": "A sala de controle", "b": "A sala de controle manda o Comunicado para todas as telas e rádios da cidade. É a parte mais vigiada do prédio, com seguranças em cada porta. A equipe precisa assumir os comandos e trancar a sala por dentro antes das nove.", "ok": "A sala é de vocês. Os técnicos foram contidos, e o Comunicado de hoje já não está nas mãos da Central.", "bad": "A segurança chegou no meio da tomada. Vocês seguraram a sala, mas só com parte dos comandos."}, {"t": "Às nove em ponto", "b": "São nove horas. A cidade inteira está parada, olhando para uma tela. A equipe precisa colocar o Sinal Fantasma no ar no lugar do Comunicado e dizer a verdade antes que a Central derrube a transmissão.", "ok": "O Sinal entrou no lugar do Comunicado. A cidade inteira ouviu a verdade até o fim.", "bad": "A Central derrubou a transmissão no meio da mensagem. A cidade ouviu só um pedaço, e ela chamou o resto de boato."}], "win": "Três vitórias, nenhuma falha. O Comunicado das nove foi de vocês do começo ao fim, e a cidade ouviu tudo sem que ninguém pudesse interromper.", "lose": "A Central estava um passo à frente o tempo todo. Quando chegou a hora, o estúdio já tinha sido trocado, e o Comunicado foi lido sem nenhuma interrupção."}, "links": {"1": [[0, "Com as credenciais de funcionário, os guardas do corredor deixam vocês passar sem muita pergunta.", "Vocês já estão sendo observados, e os guardas do corredor olham duas vezes para cada rosto."]], "2": [[1, "Ninguém sabe que vocês estão no andar do estúdio, e Sofia vai receber a equipe sem testemunhas.", "A segurança reforçou o andar. Chegar a Sofia sem ser visto ficou bem mais difícil."]], "3": [[2, "Sofia destrancou a porta da sala de controle por dentro e contou onde ficam os técnicos.", "Sem Sofia, vocês entram na sala às cegas, sem saber quantos técnicos estão lá dentro."]], "4": [[2, "Sofia vai abrir o microfone com a voz que a cidade conhece, e ninguém vai duvidar do que ouve.", "Sem Sofia, a cidade vai ouvir uma voz que não conhece, e a Central vai dizer que é falsa."], [3, "A sala de controle é de vocês, com todos os comandos nas mãos.", "A segurança ainda disputa parte dos comandos, e qualquer corte pode derrubar a transmissão."]]}, "ends": {"resAssassin": "O Assassino tentou calar o Comandante quando o Comunicado já tinha sido tomado. Ele errou o alvo, e a Central não conseguiu retomar o microfone.", "res0": "Três vitórias, nenhuma falha. O Comunicado das nove foi de vocês do começo ao fim, e a cidade ouviu tudo sem que ninguém pudesse interromper.", "res1": "Um susto no meio do caminho, mas o microfone ficou aberto até o fim. Nova Aurora ouviu a verdade, e o Comunicado perdeu a hora marcada.", "res2": "A noite custou caro. Duas missões caíram e a transmissão saiu remendada, mas o que a cidade ouviu bastou para a cidade nunca mais engolir o Comunicado sem desconfiar.", "spyAssassin": "A verdade foi ao ar, mas o Assassino encontrou o Comandante. Sem quem a sustentasse, a Central retomou o microfone e chamou tudo de boato.", "spyReject": "Enquanto vocês discutiam sem acordo, o relógio bateu nove horas. O Comunicado foi lido como em todas as noites, e a cidade ouviu a voz de sempre.", "spy0": "A Central estava um passo à frente o tempo todo. Quando chegou a hora, o estúdio já tinha sido trocado, e o Comunicado foi lido sem nenhuma interrupção.", "spy1": "Vocês chegaram perto uma vez, mas a segurança fechou o resto. O Comunicado foi lido como sempre, com um aviso a mais sobre os criminosos da noite.", "spy2": "Duas missões deram certo e foi por pouco. Às nove em ponto, a Central cortou o microfone de vocês e leu o Comunicado de sempre."}}];
+var STORY=STORIES[0].story,LINKS=STORIES[0].links,ENDS=STORIES[0].ends,INTRO=STORIES[0].intro;
+function useStory(i){
+  var k=(i>=0&&i<STORIES.length)?i:0,t=STORIES[k];
+  STORY=t.story;LINKS=t.links;ENDS=t.ends;INTRO=t.intro;
+}
+function splashView(){
+  var L=['Conectando à frequência oculta…','A Central controla toda a comunicação da cidade.','Resta uma frequência que ela ainda não encontrou.','Cada partida é um episódio desta história.'];
+  var lg='';for(var i=0;i<L.length;i++)lg+='<p style="--i:'+i+'">'+L[i]+'</p>';
+  return '<section class="splash"><div class="spl-rings" aria-hidden="true"><i></i><i></i><i></i></div>'
+   +'<p class="spl-kick">Transmissão interceptada</p><h1 class="spl-title">Sinal Fantasma</h1>'
+   +'<div class="spl-log">'+lg+'</div>'
+   +'<div class="spl-bar" aria-hidden="true"><span></span></div>'
+   +'<button class="btn primary spl-go" data-a="splashGo">Entrar no sinal</button></section>';
+}
+function introView(){
+  var n=INTRO.length,i=intro.i,last=(i===n-1),dots='',k;
+  for(k=0;k<n;k++)dots+='<i class="'+(k===i?'on':'')+'"></i>';
+  return '<div class="wrap intro"><div class="tourbar"><p class="eyebrow">História · '+(i+1)+' de '+n+'</p><button class="skip" data-a="introSkip">'+(last?'Fechar':'Pular')+'</button></div>'
+  +'<div class="scene s'+i+'">'+introArt(i)+'</div>'
+  +'<section class="lines"><h2 style="--d:.3s">'+INTRO[i][0]+'</h2><p class="lead" style="--d:1.4s">'+INTRO[i][1]+'</p></section>'
+  +'<div class="dots" aria-hidden="true">'+dots+'</div>'
+  +'<button class="btn primary" data-a="introNext">'+(last?intro.cta:'Continuar')+'</button></div>';
+}
+
+/* ---------- tutorial ---------- */
+function miniCard(c){
+  return '<div class="c3d up"><div class="in">'+SL+'<div class="face back"></div><div class="face front '+c+'">'+(c==='S'?ICON_OK:ICON_NO)+'</div></div></div>';
+}
+function miniNode(cls,inner,lab){
+  return '<div class="node '+cls+'"><div class="dot">'+inner+'</div><span class="lab">'+lab+'</span></div>';
+}
+var PHONE='<svg viewBox="0 0 80 100" width="76" height="95" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="14" y="4" width="52" height="92" rx="9"/><path d="M24 50s8-12 16-12 16 12 16 12-8 12-16 12-16-12-16-12Z"/><circle cx="40" cy="50" r="4"/></svg>';
+var TOUR=[
+  {t:'Dois times, um segredo',
+   ill:'<div class="ill-col res">'+EMB.res+'<span>Rebeldes</span><small>a maioria</small></div><div class="ill-col spy">'+EMB.spy+'<span>Infiltrados</span><small>a minoria</small></div>',
+   p:['Os Rebeldes querem libertar o Sinal e devolver a voz à cidade cumprindo missões. Os infiltrados são poucos e se escondem no meio do grupo para sabotar.',
+      'Ninguém sabe quem é quem, só os infiltrados se conhecem entre si. O jogo é descobrir quem está mentindo.']},
+  {get t(){return mode==='online'?'Cada um vê o seu papel no próprio celular':'Cada um vê o seu papel sozinho';},
+   get ill(){return '<div class="ill-col res">'+PHONE+'<small>'+(mode==='online'?'Só você vê a tela do seu celular':'Só quem está com o aparelho olha a tela')+'</small></div>';},
+   get p(){return mode==='online'
+     ?['Quando a partida começa, o seu papel aparece só no seu celular. Olhe, esconda a tela e espere os outros. Os infiltrados também veem quem são os parceiros.',
+       'O mesmo vale para votos e cartas de missão: cada um escolhe em segredo, no próprio aparelho.']
+     :['O celular passa de mão em mão. Na sua vez, olhe o seu papel, esconda a tela e passe para o próximo. Os infiltrados também veem quem são os parceiros.',
+       'O mesmo vale para votos e cartas de missão: sempre em segredo, um jogador por vez.'];}},
+  {t:'Toda rodada começa com uma equipe',
+   ill:'<div class="ill-col"><div class="vtally"><span class="a">3</span> × <span class="r">2</span></div><small>3 aprovam e 2 rejeitam: a equipe segue para a missão</small></div>',
+   p:['O líder da vez escolhe os jogadores da missão e pode se incluir. Depois todos votam em segredo, e os votos aparecem juntos.',
+      'Se a maioria aprovar, a missão acontece. Se rejeitar ou empatar, o líder passa para o próximo. Com cinco equipes rejeitadas seguidas, os infiltrados vencem.']},
+  {t:'Na missão, cada um joga uma carta',
+   ill:'<div class="ill-col"><div class="flips">'+miniCard('S')+miniCard('F')+miniCard('S')+'</div><small>As cartas são embaralhadas antes de aparecer</small></div>',
+   p:['Quem está na equipe escolhe Sucesso ou Fracasso. Agentes Rebeldes só podem escolher Sucesso, e os infiltrados escolhem o que quiserem.',
+      'Como as cartas são embaralhadas, ninguém sabe de quem foi cada uma. Basta uma carta de Fracasso para derrubar a missão. Com 7 ou mais jogadores, a 4ª missão precisa de duas.']},
+  {t:'Quem chega a três missões vence',
+   ill:'<div class="ill-col full"><div class="track">'+miniNode('win',ICON_CHECK,'M1')+miniNode('lose',ICON_X,'M2')+miniNode('win',ICON_CHECK,'M3')+miniNode('win',ICON_CHECK,'M4')+miniNode('','3','M5')+'</div><small>Três missões cumpridas e os Rebeldes vencem</small></div>',
+   p:['Os Rebeldes vencem com três missões cumpridas, e os infiltrados com três fracassadas.',
+      'Falar é livre: vale convencer, acusar e até mentir. Só não vale mostrar a sua tela, o seu papel ou a sua carta.']},
+  {t:'Modo Assassino, opcional',
+   ill:'<div class="ill-col res">'+EMB.res+'<span>Comandante</span><small>vê os infiltrados</small></div><div class="ill-arrow" aria-hidden="true">→</div><div class="ill-col spy">'+EMB.spy+'<span>Assassino</span><small>tenta achar o Comandante</small></div>',
+   p:['Um rebelde vira o Comandante e vê quem são os infiltrados. Ele precisa ajudar o grupo sem se entregar.',
+      'Se os Rebeldes cumprirem três missões, o Assassino, que é um infiltrado, tenta adivinhar quem é o Comandante. Se acertar, os infiltrados viram o jogo. Você liga esse modo na tela de montar a partida.']}
+];
+function tourView(){
+  var n=TOUR.length,i=tour.i,s=TOUR[i],last=(i===n-1),dots='';
+  for(var k=0;k<n;k++)dots+='<i class="'+(k===i?'on':'')+'"></i>';
+  return '<div class="wrap tour"><div class="tourbar"><p class="eyebrow">Como jogar · '+(i+1)+' de '+n+'</p><button class="skip" data-a="tourSkip">'+(last?'Fechar':'Pular')+'</button></div>'
+  +'<div class="illus">'+s.ill+'</div>'
+  +'<section class="stack"><h2>'+s.t+'</h2>'+s.p.map(function(x){return '<p class="lead">'+x+'</p>';}).join('')+'</section>'
+  +'<div class="dots" aria-hidden="true">'+dots+'</div>'
+  +'<div class="pair"><button class="btn" data-a="tourBack"'+(i===0?' disabled':'')+'>Voltar</button>'
+  +'<button class="btn primary" data-a="tourNext">'+(last?'Montar a partida':'Próximo')+'</button></div></div>';
+}
+
+/* ---------- telas ---------- */
+function tabs(){
+  return '<div class="tabs" role="tablist" aria-label="Como jogar">'
+  +'<button class="tab'+(mode==='local'?' on':'')+'" role="tab" aria-selected="'+(mode==='local')+'" data-a="setMode" data-v="local">No mesmo aparelho</button>'
+  +'<button class="tab'+(mode==='online'?' on':'')+'" role="tab" aria-selected="'+(mode==='online')+'" data-a="setMode" data-v="online">Online local</button></div>';
+}
+function storyView(){
+  return '<div class="wrap"><div class="tourbar"><p class="eyebrow">Antes de começar</p><button class="skip" data-a="storyBack">Voltar</button></div>'
+  +'<section class="stack"><h2>Escolha um episódio</h2><p class="lead">As regras são as mesmas. Muda a missão que o grupo vai viver.</p></section>'
+  +storyPicker(pick.sel,'pickSt')
+  +'<button class="btn primary" data-a="storyGo">Começar este episódio</button></div>';
+}
+var SVIDS={'Linha Cortada':'media/linhacortada2','Frequência Oculta':'media/frequencia','O Comunicado das Nove':'media/comunicado','O Eco':'media/eco'};
+(function(){try{for(var k in SVIDS){var im=new Image();im.src=SVIDS[k]+'.jpg';}}catch(e){}})();
+function storyPicker(sel,act){
+  var h='<section class="stack"><div class="stories" role="radiogroup" aria-label="Escolha um episódio">';
+  var el=pick.on&&pick.t0?Date.now()-pick.t0:BOOT_MS,boot=el<BOOT_MS;
+  STORIES.forEach(function(t,k){
+    var on=(k===sel);
+    h+='<button class="scard'+(on?' on':'')+(boot?' boot':'')+'"'+(boot?' style="--d:'+(k*300)+'ms;--el:-'+el+'ms"':'')+' role="radio" aria-checked="'+on+'" data-a="'+act+'" data-i="'+k+'">'
+      +'<span class="sart"><span class="sph">0'+(k+1)+'</span>'+(SVIDS[t.title]?'<video class="svid" src="'+SVIDS[t.title]+'.mp4" poster="'+SVIDS[t.title]+'.jpg" muted loop playsinline preload="metadata" disablepictureinpicture aria-hidden="true"></video>':'<img src="media/historia-'+(k+1)+'.jpg" alt="" loading="lazy" onerror="this.remove()">')+'<span class="ck">'+ICON_SMALLCHECK+'</span></span>'
+      +'<span class="st"><strong>'+t.title+'</strong><small>'+t.pitch+'</small></span></button>';
+  });
+  return h+'</div></section>';
+}
+function setupView(){return mode==='online'?onlineSetupView():localSetupView();}
+function localSetupView(){
+  var n=cfg.n,sp=SPIES[n];
+  var inputs='';
+  for(var i=0;i<n;i++){
+    inputs+='<label for="nm'+i+'">Agente Rebelde '+(i+1)+'<input type="text" id="nm'+i+'" data-name="'+i+'" value="'+esc(cfg.names[i])+'" maxlength="18" autocomplete="off" placeholder="Codinome"></label>';
+  }
+  return '<div class="wrap">'
+  +'<header class="hero"><p class="eyebrow">Dedução social</p><h1 class="glitch"><span data-t="Sinal">Sinal</span><span data-t="Fantasma">Fantasma</span></h1>'
+  +'<p class="lead">Passe o celular de mão em mão. O jogo cuida dos papéis secretos, das votações e das cartas de missão.</p></header>'
+  +tabs()+'<section class="stack"><p class="eyebrow">Quantos vão jogar</p>'
+  +'<div class="stepper"><button id="dec" data-a="dec" aria-label="Um jogador a menos"'+(n<=5?' disabled':'')+'>−</button>'
+  +'<div class="num" aria-live="polite">'+n+'</div>'
+  +'<button id="inc" data-a="inc" aria-label="Um jogador a mais"'+(n>=10?' disabled':'')+'>+</button></div>'
+  +'<p class="split"><span class="res-t">'+(n-sp)+' rebeldes</span><span class="spy-t">'+sp+' infiltrados</span></p></section>'
+  +'<section class="stack"><p class="eyebrow">Codinomes</p><div class="names">'+inputs+'</div></section>'
+  +'<label class="toggle" for="assassin"><input type="checkbox" id="assassin"'+(cfg.assassin?' checked':'')+'><span class="sw"></span>'
+  +'<span><strong>Modo Assassino</strong><small>Entram o Comandante, que conhece os infiltrados, e o Assassino. Se os Rebeldes cumprirem três missões, o Assassino ainda pode vencer apontando o Comandante.</small></span></label>'
+  +'<button class="btn primary" data-a="start">Começar partida</button>'
+  +'<button class="btn" data-a="openTour">Ver como jogar</button>'
+  +'</div>';
+}
+
+function rolesView(){
+  var i=G.idx,n=cfg.n;
+  if(G.stage==='hand'){
+    return '<div class="wrap">'+handoff('Papéis secretos · '+(i+1)+' de '+n,'Sou '+N(i)+', mostrar meu papel',{who:i,a:'showRole'})+'</div>';
+  }
+  var r=G.roles[i];
+  var spies=[];G.roles.forEach(function(x,k){if(x.team==='spy')spies.push(k);});
+  var title,body,extra='';
+  if(r.special==='comandante'){
+    title='Comandante';
+    body='Você sabe quem são os infiltrados. Oriente os Rebeldes sem se entregar: se o Assassino descobrir quem você é no final, os infiltrados vencem.';
+    extra='<p class="eyebrow">Os infiltrados são</p>'+chips(spies);
+  }else if(r.special==='assassino'){
+    title='Assassino';
+    body='Você é infiltrado. Se os Rebeldes cumprirem três missões, você ainda pode vencer apontando quem é o Comandante.';
+    extra='<p class="eyebrow">Seus parceiros</p>'+chips(spies.filter(function(k){return k!==i;}));
+  }else if(r.team==='spy'){
+    title='Infiltrado';
+    body='Finja ser um rebelde e faça três missões fracassarem. Nas missões você escolhe entre Sucesso e Fracasso.';
+    extra='<p class="eyebrow">Seus parceiros</p>'+chips(spies.filter(function(k){return k!==i;}));
+  }else{
+    title='Agente Rebelde';
+    body='Descubra quem são os infiltrados e só confie em equipes que pareçam limpas. Suas cartas de missão só podem ser de Sucesso.';
+  }
+  var last=(i===n-1);
+  return '<div class="wrap"><section class="role '+r.team+'"><p class="eyebrow">'+N(i)+', este é o seu papel</p>'+EMB[r.team]+'<h2>'+title+'</h2><p>'+body+'</p>'+extra+'</section>'
+    +'<button class="btn primary" data-a="nextRole">'+(last?'Entendi, começar a partida':'Entendi, esconder e passar')+'</button></div>';
+}
+
+function teamView(){
+  var size=TEAMS[cfg.n][G.mission],sel=G.team.length;
+  var btns='';
+  for(var i=0;i<cfg.n;i++){
+    var on=G.team.indexOf(i)>-1;
+    btns+='<button class="pbtn'+(on?' on':'')+'" data-a="toggleP" data-i="'+i+'" aria-pressed="'+on+'"><span class="nm">'+N(i)+'</span>'
+      +(i===G.leader?'<span class="tag">Líder</span>':'')+'<span class="ck">'+ICON_SMALLCHECK+'</span></button>';
+  }
+  var notes='';
+  if(cfg.n>=7&&G.mission===3)notes+='<p class="note">Com 7 ou mais jogadores, esta missão só fracassa se houver duas cartas de Fracasso.</p>';
+  if(G.rejects===4)notes+='<p class="warn">Última chance: se esta equipe for rejeitada, os infiltrados vencem.</p>';
+  return '<div class="wrap">'+board(true)+briefCard(G.mission,G.mission===0&&G.rejects===0&&G.results.length===0,G.results)
+  +'<section class="stack"><p class="eyebrow">Missão '+(G.mission+1)+' · proposta '+(G.rejects+1)+' de 5</p>'
+  +'<h2><span class="hl">'+N(G.leader)+'</span> monta a equipe</h2>'
+  +'<p class="lead">Escolha '+pl(size,'jogador','jogadores')+'. O líder pode se incluir. Conversem à vontade antes de confirmar.</p>'+notes+'</section>'
+  +'<div class="pgrid">'+btns+'</div>'
+  +'<p class="count">'+sel+' de '+size+' escolhidos</p>'
+  +'<button class="btn primary" data-a="confirmTeam"'+(sel===size?'':' disabled')+'>Confirmar equipe e votar</button></div>';
+}
+
+function voteView(){
+  var p=G.order[G.vi];
+  if(G.vstage==='hand'){
+    return '<div class="wrap">'+handoff('Votação secreta · '+(G.vi+1)+' de '+cfg.n,'Sou '+N(p)+', votar',{who:p,a:'showVote'})+'</div>';
+  }
+  return '<div class="wrap"><section class="stack"><p class="eyebrow">Voto de '+N(p)+'</p><h2>Você aprova esta equipe?</h2>'
+  +'<div class="teamline">Líder <b>'+N(G.leader)+'</b> propõe: <b>'+list(G.team)+'</b></div></section>'
+  +'<div class="pair">'
+  +'<button class="btn big yes'+(G.pick==='A'?' sel':'')+'" data-a="pickVote" data-v="A" aria-pressed="'+(G.pick==='A')+'">'+ICON_CHECK+'Aprovar</button>'
+  +'<button class="btn big no'+(G.pick==='R'?' sel':'')+'" data-a="pickVote" data-v="R" aria-pressed="'+(G.pick==='R')+'">'+ICON_X+'Rejeitar</button></div>'
+  +'<button class="btn primary" data-a="confirmVote"'+(G.pick?'':' disabled')+'>Confirmar voto e esconder</button></div>';
+}
+
+function voteResultView(){
+  var v=G.vres,rows='';
+  for(var i=0;i<cfg.n;i++){
+    var x=G.votes[i];
+    rows+='<div class="vrow '+x+'"><span class="nm">'+N(i)+'</span><span class="v">'+(x==='A'?'Aprovou':'Rejeitou')+'</span></div>';
+  }
+  var head,btn,sub;
+  if(v.ok){head='Equipe aprovada';sub='Equipe: '+list(G.team);btn='Começar a missão';}
+  else if(G.rejects>=5){head='Equipe rejeitada';sub='É a quinta rejeição seguida.';btn='Ver resultado';}
+  else{head='Equipe rejeitada';sub='Empates também rejeitam. O próximo líder será '+N((G.leader+1)%cfg.n)+'.';btn='Nova proposta';}
+  return '<div class="wrap">'+board(true)
+  +'<section class="stack"><p class="eyebrow">Resultado da votação</p>'
+  +'<div class="vtally"><span class="a">'+v.ap+'</span> × <span class="r">'+v.rj+'</span></div>'
+  +'<h2 style="text-align:center;color:'+(v.ok?'var(--res)':'var(--spy)')+'">'+head+'</h2>'
+  +'<p class="lead" style="text-align:center;margin:0 auto">'+sub+'</p></section>'
+  +'<div class="vlist">'+rows+'</div>'
+  +'<button class="btn primary" data-a="afterVote">'+btn+'</button></div>';
+}
+
+function missionView(){
+  var p=G.morder[G.mi];
+  if(G.mstage==='hand'){
+    return '<div class="wrap">'+handoff('Missão '+(G.mission+1)+' · carta '+(G.mi+1)+' de '+G.morder.length,'Sou '+N(p)+', escolher carta',{who:p,a:'showMission'})+'</div>';
+  }
+  var warn=G.warn?'<p class="warn">Agentes Rebeldes só podem escolher Sucesso.</p>':'';
+  return '<div class="wrap"><section class="stack"><p class="eyebrow">Carta de '+N(p)+'</p><h2>Como você age nesta missão?</h2>'
+  +'<p class="lead">Ninguém vê a sua escolha. As cartas são embaralhadas antes de aparecerem.</p></section>'
+  +'<div class="pair">'
+  +'<button class="btn big yes'+(G.pick==='S'?' sel':'')+'" data-a="pickCard" data-v="S" aria-pressed="'+(G.pick==='S')+'">'+ICON_OK+'Sucesso</button>'
+  +'<button class="btn big no'+(G.pick==='F'?' sel':'')+'" data-a="pickCard" data-v="F" aria-pressed="'+(G.pick==='F')+'">'+ICON_NO+'Fracasso</button></div>'
+  +warn
+  +'<button class="btn primary" data-a="confirmCard"'+(G.pick?'':' disabled')+'>Confirmar carta e esconder</button></div>';
+}
+
+function missionResultView(){
+  var m=G.mres,faces='';
+  m.cards.forEach(function(c){
+    faces+='<div class="c3d"><div class="in">'+SL+'<div class="face back"></div><div class="face front '+c+'">'+(c==='S'?ICON_OK:ICON_NO)+'</div></div></div>';
+  });
+  var title=m.ok?'Missão '+(G.mission+1)+' cumprida':'Missão '+(G.mission+1)+' fracassou';
+  var succ=m.cards.length-m.fails;
+  var sub=pl(succ,'carta de Sucesso','cartas de Sucesso')+' e '+pl(m.fails,'carta de Fracasso','cartas de Fracasso')+'.';
+  if(m.ok&&m.fails>0&&m.need===2)sub+=' Esta missão precisava de duas cartas de Fracasso, então ela passou.';
+  return '<div class="wrap">'+board(true)
+  +'<section class="stack"><p class="eyebrow">As cartas da equipe</p><div class="flips">'+faces+'</div></section>'
+  +'<section class="verdict '+(m.ok?'ok':'bad')+'" id="verdict" hidden><h2>'+title+'</h2><p>'+sub+'</p>'+outCard(G.mission,m.ok)
+  +'<button class="btn primary" data-a="afterMission">Continuar</button></section></div>';
+}
+
+function assassinView(){
+  var btns='';
+  for(var i=0;i<cfg.n;i++){
+    var on=G.apick===i;
+    btns+='<button class="pbtn'+(on?' on':'')+'" data-a="pickAssassin" data-i="'+i+'" aria-pressed="'+on+'"><span class="nm">'+N(i)+'</span><span class="ck">'+ICON_SMALLCHECK+'</span></button>';
+  }
+  return '<div class="wrap">'+board(false)
+  +'<section class="stack"><p class="eyebrow">Última chance dos infiltrados</p><h2>Os Rebeldes cumpriram três missões</h2>'
+  +'<p class="lead">Os infiltrados conversam entre si, sem revelar os papéis. Depois, só o Assassino escolhe quem acha que é o Comandante.</p></section>'
+  +'<div class="pgrid">'+btns+'</div>'
+  +'<button class="btn primary" data-a="confirmAssassin"'+(G.apick===null?' disabled':'')+'>Apontar o Comandante</button></div>';
+}
+
+function endView(){
+  var e=G.endInfo,res=e.winner==='res';
+  var rows=G.roles.map(function(r,i){
+    return '<div class="rrow '+r.team+'"><span class="nm">'+N(i)+'</span><span class="rl">'+roleLabel(r)+'</span></div>';
+  }).join('');
+  var log=G.log.map(function(x){
+    var ap=[],rj=[];
+    Object.keys(x.votes).forEach(function(k){(x.votes[k]==='A'?ap:rj).push(+k);});
+    var out;
+    if(!x.ok)out='<span class="badt">Equipe rejeitada ('+x.ap+' × '+x.rj+')</span>';
+    else if(x.result)out='<span class="'+(x.result.ok?'okt':'badt')+'">'+(x.result.ok?'Missão cumprida':'Missão fracassou')+' · '+pl(x.result.succ,'sucesso','sucessos')+', '+pl(x.result.fail,'falha','falhas')+'</span>';
+    else out='';
+    return '<li><strong>Missão '+(x.m+1)+' · líder '+N(x.leader)+'</strong>'
+      +'<span>Equipe: '+list(x.team)+'</span>'
+      +'<span class="dim">Aprovaram: '+(ap.length?list(ap):'ninguém')+'</span>'
+      +'<span class="dim">Rejeitaram: '+(rj.length?list(rj):'ninguém')+'</span>'+out+'</li>';
+  }).join('');
+  return '<div class="wrap">'+board(false)
+  +'<section class="banner '+(res?'res':'spy')+'"><p class="eyebrow">Fim de jogo</p>'+EMB[res?'res':'spy']
+  +'<h1 style="font-size:clamp(24px,8vw,36px)">'+(res?'Os Rebeldes venceram':'Os infiltrados venceram')+'</h1><p>'+esc(e.reason)+'</p><p class="story-end">'+endStory(e.winner,G.results,e.reason)+'</p></section>'
+  +'<section class="stack"><h3>Quem era quem</h3><div class="roles">'+rows+'</div></section>'
+  +(log?'<section class="stack"><h3>Histórico da partida</h3><ul class="log">'+log+'</ul></section>':'')
+  +'<div class="actions"><button class="btn primary" data-a="again">Jogar de novo com os mesmos jogadores</button>'
+  +'<button class="btn" data-a="toSetup">Mudar jogadores ou modo</button></div></div>';
+}
+
+/* ---------- online ---------- */
+var mode='local';
+var OL={status:'checking',db:null,user:null,id:null,name:'',code:'',msg:'',busy:false};
+var O=null;
+try{OL.name=localStorage.getItem('rd_name')||'';}catch(e){}
+if(!OL.name)OL.name=codePool()[0];
+var ALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+var LOW='abcdefghijklmnopqrstuvwxyz0123456789';
+function rnd(len,alpha){var s='';for(var i=0;i<len;i++)s+=alpha.charAt(Math.floor(Math.random()*alpha.length));return s;}
+function clone(x){return JSON.parse(JSON.stringify(x));}
+function byJoined(a,b){return (a.joined-b.joined)||(a.id<b.id?-1:1);}
+function oName(id){
+  var l=(O&&O.game&&O.game.players&&O.game.players.length)?O.game.players:(O?O.players||[]:[]);
+  for(var i=0;i<l.length;i++)if(l[i].id===id)return l[i].name;
+  return 'Agente';
+}
+function oN(id){return esc(oName(id));}
+function oList(ids){return ids.map(oN).join(', ');}
+function oKey(g){return g.phase==='assassin'?g.gid+'.assassin':g.gid+'.m'+g.mission+'.a'+g.attempt;}
+function normG(g){
+  g.players=g.players||[];g.results=g.results||[];g.team=g.team||[];g.log=g.log||[];
+  g.story=g.story||0;g.mission=g.mission||0;g.attempt=g.attempt||0;g.rejects=g.rejects||0;g.leader=g.leader||0;
+  return g;
+}
+
+var rafP=false;
+function softRender(){
+  if(rafP)return;
+  rafP=true;
+  var f=function(){rafP=false;if(O&&O.flipRunning)return;if(!O&&G)return;render();};
+  if(window.requestAnimationFrame)window.requestAnimationFrame(f);else setTimeout(f,16);
+}
+
+
+/* ---------- Supabase (modo online fora do Claude) ----------
+   Imita a interface de banco usada pelo jogo: doc(path).get/set/delete/onSnapshot e collection(path).get/onSnapshot/doc(id).
+   Tabela única public.docs(path, game, data). Veja supabase/schema.sql. */
+function makeSupabaseDb(url,key){
+  var sb=window.supabase.createClient(url,key,{auth:{persistSession:false}});
+  var chans={};
+  function gameOf(path){return String(path).split('/')[1]||'';}
+  function mkDoc(path,row){return {id:path.split('/').pop(),exists:!!row,data:function(){return row?JSON.parse(JSON.stringify(row.data)):undefined;}};}
+  function getDoc(path){
+    return sb.from('docs').select('path,data').eq('path',path).maybeSingle().then(function(r){
+      if(r.error)throw r.error;return mkDoc(path,r.data);
+    });
+  }
+  function getCol(path){
+    return sb.from('docs').select('path,data').like('path',path+'/%').then(function(r){
+      if(r.error)throw r.error;
+      var depth=path.split('/').length+1;
+      var docs=(r.data||[]).filter(function(x){return x.path.split('/').length===depth;}).map(function(x){return mkDoc(x.path,x);});
+      return {docs:docs,size:docs.length,forEach:function(f){docs.forEach(f);}};
+    });
+  }
+  function listen(path,fetcher,cb,errCb){
+    var game=gameOf(path),dead=false,busy=false,again=false;
+    function run(){
+      if(dead)return;
+      if(busy){again=true;return;}
+      busy=true;
+      fetcher().then(function(snap){if(!dead)cb(snap);},function(e){if(!dead&&errCb)errCb(e);}).then(function(){busy=false;if(again){again=false;run();}});
+    }
+    var c=chans[game];
+    if(!c){
+      c={ls:[],ch:null};
+      c.ch=sb.channel('game-'+game).on('postgres_changes',{event:'*',schema:'public',table:'docs',filter:'game=eq.'+game},function(p){
+        var row=p.new&&p.new.path?p.new:p.old;
+        var pa=row&&row.path?row.path:'';
+        c.ls.slice().forEach(function(l){if(!pa||pa===l.path||pa.indexOf(l.path+'/')===0)l.run();});
+      }).subscribe();
+      chans[game]=c;
+    }
+    var item={path:path,run:run};
+    c.ls.push(item);
+    var poll=setInterval(run,6000); /* segurança: se um evento em tempo real se perder */
+    run();
+    return function(){
+      dead=true;clearInterval(poll);
+      var i=c.ls.indexOf(item);if(i>=0)c.ls.splice(i,1);
+      if(!c.ls.length&&chans[game]===c){delete chans[game];try{sb.removeChannel(c.ch);}catch(e){}}
+    };
+  }
+  function doc(path){
+    return {
+      get:function(){return getDoc(path);},
+      set:function(obj){
+        return sb.from('docs').upsert({path:path,game:gameOf(path),data:obj,updated_at:new Date().toISOString()}).then(function(r){if(r.error)throw r.error;});
+      },
+      delete:function(){return sb.from('docs').delete().eq('path',path).then(function(r){if(r.error)throw r.error;});},
+      onSnapshot:function(cb,err){return listen(path,function(){return getDoc(path);},cb,err);}
+    };
+  }
+  function collection(path){
+    return {
+      get:function(){return getCol(path);},
+      doc:function(id){return doc(path+'/'+id);},
+      onSnapshot:function(cb,err){return listen(path,function(){return getCol(path);},cb,err);}
+    };
+  }
+  return {doc:doc,collection:collection};
+}
+function localUserId(){
+  var id='';
+  try{id=localStorage.getItem('rd_uid')||'';}catch(e){}
+  if(!id){id=rnd(16,LOW);try{localStorage.setItem('rd_uid',id);}catch(e){}}
+  return id;
+}
+function initOnline(){
+  if(!window.claude||!window.claude.use){
+    var cf=window.SINAL_CONFIG||{};
+    if(cf.supabaseUrl&&cf.supabaseKey&&window.supabase){
+      try{OL.db=makeSupabaseDb(cf.supabaseUrl,cf.supabaseKey);OL.id=localUserId();OL.status='ok';}catch(e){OL.status='unavailable';}
+    }else OL.status='unavailable';
+    return Promise.resolve();
+  }
+  return Promise.all([window.claude.use('db'),window.claude.use('user')]).then(function(r){
+    OL.db=r[0];OL.user=r[1];
+    if(!OL.db||!OL.user){OL.status='unavailable';return null;}
+    return Promise.all([OL.user.id(),OL.user.can('data.write')]);
+  }).then(function(r){
+    if(!r)return;
+    OL.id=r[0];
+    if(!OL.id)OL.status='unavailable';
+    else if(r[1]===false)OL.status='readonly';
+    else OL.status='ok';
+  }).catch(function(){OL.status='unavailable';});
+}
+function afterInit(){
+  var saved='';
+  try{saved=localStorage.getItem('rd_code')||'';}catch(e){}
+  if(OL.status==='ok'&&saved&&!O&&!G){
+    O={ready:false,connecting:true};
+    mode='online';
+    render();
+    joinGame(saved,OL.name,true);
+  }else softRender();
+}
+
+function oFail(msg){
+  OL.busy=false;O=null;OL.msg=msg;
+  try{localStorage.removeItem('rd_code');}catch(e){}
+  softRender();
+}
+function createGame(name){
+  OL.busy=true;
+  var code=null,tries=0;
+  function attempt(){
+    code=rnd(5,ALPHA);
+    return OL.db.doc('games/'+code).get().then(function(s){
+      if(s.exists){tries++;if(tries>6)throw {msg:'Sinal perdido ao criar a partida. Tente de novo.'};return attempt();}
+    });
+  }
+  return attempt().then(function(){
+    return OL.db.doc('games/'+code).set({code:code,hostId:OL.id,phase:'lobby',assassin:false,story:cfg.story,gid:'',created:Date.now(),players:[],mission:0,attempt:0,rejects:0,leader:0,results:[],team:[],log:[],vres:null,mres:null,endInfo:null});
+  }).then(function(){
+    return OL.db.doc('games/'+code+'/players/'+OL.id).set({id:OL.id,name:name,joined:Date.now()});
+  }).then(function(){
+    OL.busy=false;openSession(code,true);
+  }).catch(function(e){oFail((e&&e.msg)||'Sinal perdido ao criar a partida. Confira se você tem acesso de edição ao jogo.');});
+}
+function joinGame(code,name,resume){
+  code=String(code||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(code.length!==5){OL.msg='Digite o código de 5 letras ou números.';softRender();return Promise.resolve();}
+  OL.busy=true;
+  return OL.db.doc('games/'+code).get().then(function(s){
+    if(!s.exists)throw {msg:'Nenhum sinal com esse código. Confira e tente de novo.'};
+    var g=s.data();
+    var pd=OL.db.doc('games/'+code+'/players/'+OL.id);
+    return pd.get().then(function(ps){
+      if(ps.exists)return g;
+      if(g.phase!=='lobby')throw {msg:'Essa partida já começou.'};
+      return OL.db.collection('games/'+code+'/players').get().then(function(q){
+        if(q.size>=10)throw {msg:'A partida já tem 10 jogadores.'};
+        return pd.set({id:OL.id,name:name,joined:Date.now()}).then(function(){return g;});
+      });
+    });
+  }).then(function(g){
+    OL.busy=false;openSession(code,g.hostId===OL.id);
+  }).catch(function(e){oFail((e&&e.msg)||'Sinal perdido ao entrar na partida. Tente de novo.');});
+}
+
+function openSession(code,isHost){
+  O={code:code,isHost:isHost,ready:false,game:null,players:[],intents:{},cards:[],allRoles:null,myRole:null,
+     unsubs:[],busy:false,sending:false,retries:0,showRole:false,seenGid:null,sel:[],pick:null,warn:false,selKey:'',
+     flipKey:'',flipRunning:false,copied:false,copyFail:false,err:''};
+  mode='online';
+  try{localStorage.setItem('rd_code',code);localStorage.setItem('rd_name',OL.name);O.seenGid=localStorage.getItem('rd_seen_'+code)||null;}catch(e){}
+  var db=OL.db,base='games/'+code;
+  var onErr=function(e){
+    if(!O||O.code!==code)return;
+    if(e&&e.code==='revoked'){closeSession('Você perdeu o acesso a esta partida.');return;}
+    O.err='Sinal instável. Aguarde um instante.';softRender();
+  };
+  O.unsubs.push(db.doc(base).onSnapshot(function(s){
+    if(!O||O.code!==code)return;
+    if(!s.exists){closeSession('Esse sinal se apagou: a partida não existe mais.');return;}
+    O.game=normG(clone(s.data()));O.ready=true;O.err='';onGameChange();
+  },onErr));
+  O.unsubs.push(db.collection(base+'/players').onSnapshot(function(q){
+    if(!O||O.code!==code)return;
+    O.players=q.docs.map(function(d){return d.data();}).sort(byJoined);softRender();hostTick();
+  },onErr));
+  O.unsubs.push(db.collection(base+'/intents').onSnapshot(function(q){
+    if(!O||O.code!==code)return;
+    var m={};q.docs.forEach(function(d){m[d.id]=d.data();});O.intents=m;softRender();hostTick();
+  },onErr));
+  if(isHost){
+    O.unsubs.push(db.collection(base+'/cards').onSnapshot(function(q){
+      if(!O||O.code!==code)return;
+      O.cards=q.docs.map(function(d){return d.data();});hostTick();
+    },onErr));
+    O.unsubs.push(db.collection(base+'/roles').onSnapshot(function(q){
+      if(!O||O.code!==code)return;
+      var m={};q.docs.forEach(function(d){m[d.id]=d.data();});O.allRoles=m;O.myRole=m[OL.id]||null;onGameChange();
+    },onErr));
+  }else{
+    O.unsubs.push(db.doc(base+'/roles/'+OL.id).onSnapshot(function(s){
+      if(!O||O.code!==code)return;
+      O.myRole=s.exists?s.data():null;onGameChange();
+    },onErr));
+  }
+  render();
+}
+function onGameChange(){
+  var g=O.game;
+  if(g&&g.phase!=='lobby'&&O.myRole&&O.myRole.gid===g.gid&&O.seenGid!==g.gid){
+    O.seenGid=g.gid;O.showRole=true;
+    if(!O.introShown){O.introShown=true;introOpen(null,'Ver meu papel');}
+    try{localStorage.setItem('rd_seen_'+O.code,g.gid);}catch(e){}
+  }
+  softRender();hostTick();
+}
+function leaveSession(){
+  if(!O)return;
+  var code=O.code,lobbyPlayer=O.game&&O.game.phase==='lobby'&&!O.isHost;
+  O.unsubs.forEach(function(u){try{u();}catch(e){}});
+  O=null;
+  try{localStorage.removeItem('rd_code');}catch(e){}
+  if(lobbyPlayer&&OL.db)OL.db.doc('games/'+code+'/players/'+OL.id).delete().catch(function(){});
+}
+function closeSession(msg){leaveSession();OL.msg=msg;softRender();}
+
+/* operador: único que avança a partida */
+function hostSet(next){
+  O.busy=true;
+  return OL.db.doc('games/'+O.code).set(next).then(function(){
+    if(!O)return;
+    O.busy=false;O.retries=0;O.err='';O.game=normG(clone(next));softRender();setTimeout(hostTick,0);
+  }).catch(function(){
+    if(!O)return;
+    O.busy=false;O.retries++;
+    if(O.retries<4){setTimeout(hostTick,1500);}
+    else{O.err='Sinal perdido ao registrar a jogada. Confira a conexão e toque em Continuar de novo.';softRender();}
+  });
+}
+function hostStart(plist,assassin,story){
+  if(!O||!O.isHost||O.busy)return;
+  var n=plist.length;
+  if(n<5||n>10)return;
+  var seen={};
+  var ps=plist.map(function(p,i){
+    var b=(p.name||'').trim()||('Agente '+(i+1)),k=b,c=2;
+    while(seen[k.toLowerCase()]){k=b+' '+c;c++;}
+    seen[k.toLowerCase()]=1;return {id:p.id,name:k};
+  });
+  var sp=SPIES[n],roles=[],i;
+  for(i=0;i<n-sp;i++)roles.push({team:'res',special:null});
+  for(i=0;i<sp;i++)roles.push({team:'spy',special:null});
+  if(assassin){roles[0].special='comandante';roles[n-sp].special='assassino';}
+  roles=shuffle(roles);
+  var gid=rnd(6,LOW),spyIds=[];
+  roles.forEach(function(r,k){if(r.team==='spy')spyIds.push(ps[k].id);});
+  O.busy=true;O.err='';
+  var chain=Promise.resolve();
+  ps.forEach(function(p,k){
+    var r=roles[k];
+    chain=chain.then(function(){
+      return OL.db.doc('games/'+O.code+'/roles/'+p.id).set({gid:gid,team:r.team,special:r.special,spies:(r.team==='spy'||r.special==='comandante')?spyIds:[]});
+    });
+  });
+  return chain.then(function(){
+    var g={code:O.code,hostId:OL.id,phase:'team',assassin:!!assassin,story:story||0,gid:gid,created:Date.now(),players:ps,mission:0,attempt:0,rejects:0,leader:Math.floor(Math.random()*n),results:[],team:[],log:[],vres:null,mres:null,endInfo:null};
+    return OL.db.doc('games/'+O.code).set(g).then(function(){
+      if(!O)return;
+      O.busy=false;O.game=normG(clone(g));softRender();
+    });
+  }).catch(function(){
+    if(!O)return;
+    O.busy=false;O.err='Sinal perdido ao começar a partida. Tente de novo.';softRender();
+  });
+}
+function finishOnline(g,winner,reason){
+  g.phase='end';
+  var roles=g.players.map(function(p){
+    var r=(O.allRoles&&O.allRoles[p.id])||{team:'res',special:null};
+    return {id:p.id,team:r.team,special:r.special||null};
+  });
+  g.endInfo={winner:winner,reason:reason,roles:roles};
+}
+function hostTick(){
+  if(!O||!O.isHost||O.busy||!O.game||!O.game.players||!O.game.players.length)return;
+  var g=O.game,n=g.players.length,key=oKey(g),next=null;
+  if(g.phase==='team'){
+    var lid=g.players[g.leader].id,it=O.intents[lid];
+    if(it&&it.phase==='team'&&it.key===key&&it.team&&it.team.length){
+      var size=TEAMS[n][g.mission],ids=[];
+      it.team.forEach(function(id){if(ids.indexOf(id)<0&&g.players.some(function(p){return p.id===id;}))ids.push(id);});
+      if(ids.length===size){next=clone(g);next.team=ids;next.phase='vote';}
+    }
+  }else if(g.phase==='vote'){
+    var votes={},cnt=0,ap=0;
+    g.players.forEach(function(p){
+      var v=O.intents[p.id];
+      if(v&&v.phase==='vote'&&v.key===key&&(v.vote==='A'||v.vote==='R')){votes[p.id]=v.vote;cnt++;if(v.vote==='A')ap++;}
+    });
+    if(cnt===n){
+      var rj=n-ap,ok=ap>rj;
+      next=clone(g);next.vres={ap:ap,rj:rj,ok:ok,votes:votes};
+      if(!ok)next.rejects++;
+      next.log.push({m:g.mission,leader:g.players[g.leader].id,team:g.team.slice(),votes:votes,ap:ap,rj:rj,ok:ok,result:null});
+      next.phase='voteResult';
+    }
+  }else if(g.phase==='mission'){
+    var done=g.team.filter(function(id){var v=O.intents[id];return v&&v.phase==='mission'&&v.key===key&&v.done;}).length;
+    if(done===g.team.length){
+      var cs=O.cards.filter(function(c){return c.key===key;}).map(function(c){return c.card==='F'?'F':'S';});
+      if(cs.length>=g.team.length){
+        cs=shuffle(cs.slice(0,g.team.length));
+        var fails=cs.filter(function(c){return c==='F';}).length,need=(n>=7&&g.mission===3)?2:1,ok2=fails<need;
+        next=clone(g);next.results[g.mission]=ok2?'S':'F';
+        next.log[next.log.length-1].result={succ:cs.length-fails,fail:fails,ok:ok2};
+        next.mres={cards:cs,fails:fails,ok:ok2,need:need};next.phase='missionResult';
+      }
+    }
+  }else if(g.phase==='assassin'&&O.allRoles){
+    var aid=null,cid=null;
+    g.players.forEach(function(p){
+      var r=O.allRoles[p.id];
+      if(r){if(r.special==='assassino')aid=p.id;if(r.special==='comandante')cid=p.id;}
+    });
+    var a=aid&&O.intents[aid];
+    if(a&&a.phase==='assassin'&&a.key===key&&g.players.some(function(p){return p.id===a.pick;})){
+      next=clone(g);
+      if(a.pick===cid)finishOnline(next,'spy','O Assassino apontou '+oName(a.pick)+', e era mesmo o Comandante.');
+      else finishOnline(next,'res','O Assassino apontou '+oName(a.pick)+', mas o Comandante era '+oName(cid)+'.');
+    }
+  }
+  if(next)hostSet(next);
+}
+function hostContinue(){
+  if(!O||!O.isHost||O.busy||!O.game)return;
+  var g=clone(O.game),n=g.players.length;
+  if(g.phase==='voteResult'){
+    if(g.vres.ok){g.phase='mission';}
+    else if(g.rejects>=5){finishOnline(g,'spy','Cinco equipes seguidas foram rejeitadas.');}
+    else{g.leader=(g.leader+1)%n;g.team=[];g.attempt++;g.phase='team';g.vres=null;}
+  }else if(g.phase==='missionResult'){
+    var s=g.results.filter(function(r){return r==='S';}).length;
+    var f=g.results.filter(function(r){return r==='F';}).length;
+    if(s>=3){
+      if(g.assassin)g.phase='assassin';
+      else finishOnline(g,'res','Três missões foram cumpridas com sucesso.');
+    }else if(f>=3){finishOnline(g,'spy','Três missões fracassaram.');}
+    else{g.mission++;g.rejects=0;g.attempt=0;g.leader=(g.leader+1)%n;g.team=[];g.phase='team';g.mres=null;g.vres=null;}
+  }else return;
+  hostSet(g);
+}
+
+/* jogadores: enviam intenções */
+function sendIntent(obj){
+  if(!O||O.sending)return;
+  O.sending=true;O.err='';obj.t=Date.now();
+  OL.db.doc('games/'+O.code+'/intents/'+OL.id).set(obj).then(function(){
+    if(O){O.sending=false;softRender();}
+  }).catch(function(){
+    if(O){O.sending=false;O.err='Sinal perdido ao enviar. Tente de novo.';softRender();}
+  });
+}
+function sendCard(key,card){
+  if(!O||O.sending)return;
+  O.sending=true;O.err='';
+  var code=O.code;
+  OL.db.collection('games/'+code+'/cards').doc(rnd(14,LOW)).set({key:key,card:card}).then(function(){
+    return OL.db.doc('games/'+code+'/intents/'+OL.id).set({phase:'mission',key:key,done:true,t:Date.now()});
+  }).then(function(){
+    if(O){O.sending=false;softRender();}
+  }).catch(function(){
+    if(O){O.sending=false;O.err='Sinal perdido ao enviar a carta. Tente de novo.';softRender();}
+  });
+}
+
+/* telas online */
+function onlineSetupView(){
+  var body;
+  if(OL.status==='checking')body='<p class="lead">Procurando o sinal da partida online...</p>';
+  else if(OL.status==='unavailable')body='<p class="warn">O Online local não está disponível agora. Confira a conexão e tente de novo mais tarde.</p>';
+  else if(OL.status==='readonly')body='<p class="warn">Você abriu o jogo só para ver. Peça ao dono para dar acesso de edição e poder jogar no Online local.</p>';
+  else{
+    var dis=OL.busy?' disabled':'';
+    body='<section class="stack"><label class="fieldlab" for="oname">Seu codinome</label>'
+    +'<input type="text" id="oname" data-oname="1" value="'+esc(OL.name)+'" maxlength="18" autocomplete="off" placeholder="Como os amigos vão te ver"></section>'
+    +'<button class="btn primary" data-a="createOnline"'+dis+'>'+(OL.busy?'Conectando...':'Criar partida')+'</button>'
+    +'<p class="or">ou</p>'
+    +'<section class="stack"><label class="fieldlab" for="ocode">Código da partida</label>'
+    +'<input type="text" id="ocode" class="ocodeinput" data-ocode="1" value="'+esc(OL.code)+'" maxlength="5" autocomplete="off" autocapitalize="characters" placeholder="ABCDE"></section>'
+    +'<button class="btn" data-a="joinOnline"'+dis+'>Entrar na partida</button>'
+    +(OL.msg?'<p class="warn">'+esc(OL.msg)+'</p>':'');
+  }
+  return '<div class="wrap">'
+  +'<header class="hero"><p class="eyebrow">Dedução social</p><h1 class="glitch"><span data-t="Sinal">Sinal</span><span data-t="Fantasma">Fantasma</span></h1>'
+  +'<p class="lead">Cada um joga no seu celular. Um cria a partida e manda o código para os outros.</p></header>'
+  +tabs()+body+'<button class="btn" data-a="openTour">Ver como jogar</button></div>';
+}
+function obar(){
+  var g=O.game,playing=g&&g.phase!=='lobby'&&O.myRole&&O.myRole.gid===g.gid;
+  return '<div class="obar"><span class="ocode">Frequência <b>'+esc(O.code)+'</b>'+(O.isHost?' · operador':'')+'</span><span class="obtns">'
+  +(playing?'<button class="mini" data-a="oRole">'+(O.showRole?'Fechar papel':'Meu papel')+'</button>':'')
+  +'<button class="mini" data-a="oLeave">Sair</button></span></div>';
+}
+function obard(meta){
+  var g=O.game;
+  return boardCtx({n:g.players.length,mission:g.mission,results:g.results,rejects:g.rejects,leaderName:oN(g.players[g.leader].id),screen:g.phase},meta);
+}
+function ochips(ids){return '<ul class="chips">'+ids.map(function(id){return '<li class="chip">'+oN(id)+'</li>';}).join('')+'</ul>';}
+
+function onlineView(){
+  if(!O.ready||!O.game){
+    return '<div class="wrap"><section class="handoff"><p class="eyebrow">Conectando</p><h2>Entrando na partida</h2><p class="lead">Só um instante.</p></section></div>';
+  }
+  var g=O.game,sk=g.phase+'|'+oKey(g),body;
+  if(O.selKey!==sk){O.selKey=sk;O.sel=[];O.pick=null;O.warn=false;}
+  var inGame=g.phase!=='lobby';
+  var isPlayer=g.players.some(function(p){return p.id===OL.id;});
+  if(!inGame)body=oLobby();
+  else if(!isPlayer)body='<section class="handoff"><p class="eyebrow">Partida em andamento</p><h2>Você não está nesta partida</h2><p class="lead">Ela já começou sem você. Toque em Sair e crie uma nova partida.</p></section>';
+  else if(!O.myRole||O.myRole.gid!==g.gid)body='<section class="handoff"><p class="eyebrow">Preparando</p><h2>Recebendo o seu papel</h2><p class="lead">Se demorar, peça ao operador para reabrir a página.</p></section>';
+  else if(O.showRole)body=oRoleSheet();
+  else if(g.phase==='team')body=oTeam();
+  else if(g.phase==='vote')body=oVote();
+  else if(g.phase==='voteResult')body=oVoteResult();
+  else if(g.phase==='mission')body=oMission();
+  else if(g.phase==='missionResult')body=oMissionResult();
+  else if(g.phase==='assassin')body=oAssassin();
+  else body=oEnd();
+  return '<div class="wrap">'+obar()+(O.err?'<p class="warn">'+esc(O.err)+'</p>':'')+body+'</div>';
+}
+
+function oLobby(){
+  var g=O.game,list=O.players,n=list.length;
+  var rows=list.map(function(p){
+    return '<div class="rrow res"><span class="nm">'+esc(p.name)+(p.id===OL.id?' (você)':'')+'</span><span class="rl">'+(p.id===g.hostId?'Operador':'')+'</span></div>';
+  }).join('');
+  var copy=O.copyFail?'Toque e segure o código para copiar':(O.copied?'Código copiado':'Copiar código');
+  var host;
+  if(O.isHost){
+    host='<label class="toggle" for="oassassin"><input type="checkbox" id="oassassin"'+(g.assassin?' checked':'')+'><span class="sw"></span>'
+    +'<span><strong>Modo Assassino</strong><small>Entram o Comandante e o Assassino. Cada um vê o seu papel no próprio celular.</small></span></label>'
+    +'<button class="btn primary" data-a="oStart"'+((n>=5&&n<=10&&!O.busy)?'':' disabled')+'>'+(O.busy?'Distribuindo papéis...':'Começar partida')+'</button>'
+    +(n<5?'<p class="lead" style="text-align:center">Faltam '+pl(5-n,'jogador','jogadores')+' para começar.</p>':'');
+  }else{
+    host='<p class="lead" style="text-align:center">Modo Assassino: '+(g.assassin?'ligado':'desligado')+'. Aguardando o operador começar a partida.</p>';
+  }
+  return '<section class="stack"><p class="eyebrow">Preparando a partida</p><h2>Mande o código para os amigos</h2>'
+  +'<p class="lead">Cada um abre este mesmo jogo, toca em Online local, digita o codinome e o código.</p></section>'
+  +'<div class="codebox"><span class="fieldlab">Código da partida</span><div class="code">'+esc(O.code)+'</div><button class="btn" data-a="oCopy">'+copy+'</button></div>'
+  +'<section class="stack"><h3>Na frequência</h3><div class="roles">'+rows+'</div><p class="count">'+n+' de 10 · mínimo 5</p></section>'+host;
+}
+
+function oRoleSheet(){
+  var r=O.myRole,me=OL.id,others=(r.spies||[]).filter(function(id){return id!==me;});
+  var title,body,extra='';
+  if(r.special==='comandante'){
+    title='Comandante';
+    body='Você sabe quem são os infiltrados. Oriente os Rebeldes sem se entregar: se o Assassino descobrir quem você é no final, os infiltrados vencem.';
+    extra='<p class="eyebrow">Os infiltrados são</p>'+ochips(r.spies||[]);
+  }else if(r.special==='assassino'){
+    title='Assassino';
+    body='Você é infiltrado. Se os Rebeldes cumprirem três missões, você ainda pode vencer apontando quem é o Comandante.';
+    extra='<p class="eyebrow">Seus parceiros</p>'+ochips(others);
+  }else if(r.team==='spy'){
+    title='Infiltrado';
+    body='Finja ser um rebelde e faça três missões fracassarem. Nas missões você escolhe entre Sucesso e Fracasso.';
+    extra='<p class="eyebrow">Seus parceiros</p>'+ochips(others);
+  }else{
+    title='Agente Rebelde';
+    body='Descubra quem são os infiltrados e só confie em equipes que pareçam limpas. Suas cartas de missão só podem ser de Sucesso.';
+  }
+  return '<section class="role '+r.team+'"><p class="eyebrow">Seu papel secreto</p>'+EMB[r.team]+'<h2>'+title+'</h2><p>'+body+'</p>'+extra+'</section>'
+  +'<button class="btn primary" data-a="oHideRole">Entendi, esconder</button>'
+  +'<p class="lead" style="text-align:center">Você pode rever o papel a qualquer momento no botão Meu papel.</p>';
+}
+
+function oTeam(){
+  var g=O.game,n=g.players.length,size=TEAMS[n][g.mission],lid=g.players[g.leader].id,key=oKey(g);
+  var head='<p class="eyebrow">Missão '+(g.mission+1)+' · proposta '+(g.attempt+1)+' de 5</p>';
+  var brief=briefCard(g.mission,g.mission===0&&g.attempt===0&&g.results.length===0,g.results);
+  var notes='';
+  if(n>=7&&g.mission===3)notes+='<p class="note">Com 7 ou mais jogadores, esta missão só fracassa se houver duas cartas de Fracasso.</p>';
+  if(g.rejects===4)notes+='<p class="warn">Última chance: se esta equipe for rejeitada, os infiltrados vencem.</p>';
+  if(lid!==OL.id){
+    return obard(true)+brief+'<section class="stack">'+head+'<h2><span class="hl">'+oN(lid)+'</span> está montando a equipe</h2>'
+    +'<p class="lead">A missão precisa de '+pl(size,'jogador','jogadores')+'. Aproveitem para conversar e trocar palpites.</p>'+notes+'</section>';
+  }
+  var mine=O.intents[OL.id];
+  if(mine&&mine.phase==='team'&&mine.key===key){
+    return obard(true)+brief+'<section class="stack">'+head+'<h2>Equipe enviada</h2><p class="lead">A votação já vai começar.</p></section>';
+  }
+  var btns=g.players.map(function(p,i){
+    var on=O.sel.indexOf(p.id)>-1;
+    return '<button class="pbtn'+(on?' on':'')+'" data-a="oToggle" data-i="'+i+'" aria-pressed="'+on+'"><span class="nm">'+esc(p.name)+(p.id===OL.id?' (você)':'')+'</span><span class="ck">'+ICON_SMALLCHECK+'</span></button>';
+  }).join('');
+  return obard(true)+brief+'<section class="stack">'+head+'<h2>Você é o líder: monte a equipe</h2>'
+  +'<p class="lead">Escolha '+pl(size,'jogador','jogadores')+', pode se incluir. Conversem à vontade antes de confirmar.</p>'+notes+'</section>'
+  +'<div class="pgrid">'+btns+'</div><p class="count">'+O.sel.length+' de '+size+' escolhidos</p>'
+  +'<button class="btn primary" data-a="oConfirmTeam"'+(O.sel.length===size?'':' disabled')+'>Confirmar equipe e votar</button>';
+}
+
+function oVote(){
+  var g=O.game,n=g.players.length,key=oKey(g),cnt=0;
+  g.players.forEach(function(p){var v=O.intents[p.id];if(v&&v.phase==='vote'&&v.key===key)cnt++;});
+  var mine=O.intents[OL.id],voted=mine&&mine.phase==='vote'&&mine.key===key;
+  var head='<p class="eyebrow">Votação secreta · '+cnt+' de '+n+' votaram</p>';
+  var line='<div class="teamline">Líder <b>'+oN(g.players[g.leader].id)+'</b> propõe: <b>'+oList(g.team)+'</b></div>';
+  if(voted){
+    return obard(true)+'<section class="stack">'+head+'<h2>Voto registrado</h2>'+line+'<p class="lead">Aguardando os outros jogadores.</p></section>';
+  }
+  return obard(true)+'<section class="stack">'+head+'<h2>Você aprova esta equipe?</h2>'+line+'</section>'
+  +'<div class="pair">'
+  +'<button class="btn big yes'+(O.pick==='A'?' sel':'')+'" data-a="oPickVote" data-v="A" aria-pressed="'+(O.pick==='A')+'">'+ICON_CHECK+'Aprovar</button>'
+  +'<button class="btn big no'+(O.pick==='R'?' sel':'')+'" data-a="oPickVote" data-v="R" aria-pressed="'+(O.pick==='R')+'">'+ICON_X+'Rejeitar</button></div>'
+  +'<button class="btn primary" data-a="oConfirmVote"'+(O.pick?'':' disabled')+'>Confirmar voto</button>';
+}
+
+function oVoteResult(){
+  var g=O.game,v=g.vres,rows='';
+  g.players.forEach(function(p){
+    var x=v.votes[p.id];
+    rows+='<div class="vrow '+x+'"><span class="nm">'+esc(p.name)+'</span><span class="v">'+(x==='A'?'Aprovou':'Rejeitou')+'</span></div>';
+  });
+  var head,btn,sub,n=g.players.length;
+  if(v.ok){head='Equipe aprovada';sub='Equipe: '+oList(g.team);btn='Começar a missão';}
+  else if(g.rejects>=5){head='Equipe rejeitada';sub='É a quinta rejeição seguida.';btn='Ver resultado';}
+  else{head='Equipe rejeitada';sub='Empates também rejeitam. O próximo líder será '+oN(g.players[(g.leader+1)%n].id)+'.';btn='Nova proposta';}
+  var act=O.isHost?'<button class="btn primary" data-a="oContinue"'+(O.busy?' disabled':'')+'>'+btn+'</button>':'<p class="lead" style="text-align:center">Quem avança a partida é o operador.</p>';
+  return obard(true)+'<section class="stack"><p class="eyebrow">Resultado da votação</p>'
+  +'<div class="vtally"><span class="a">'+v.ap+'</span> × <span class="r">'+v.rj+'</span></div>'
+  +'<h2 style="text-align:center;color:'+(v.ok?'var(--res)':'var(--spy)')+'">'+head+'</h2>'
+  +'<p class="lead" style="text-align:center;margin:0 auto">'+sub+'</p></section>'
+  +'<div class="vlist">'+rows+'</div>'+act;
+}
+
+function oMission(){
+  var g=O.game,key=oKey(g),m=g.team.length,inTeam=g.team.indexOf(OL.id)>-1,cnt=0;
+  g.team.forEach(function(id){var v=O.intents[id];if(v&&v.phase==='mission'&&v.key===key&&v.done)cnt++;});
+  var mine=O.intents[OL.id],done=mine&&mine.phase==='mission'&&mine.key===key&&mine.done;
+  var head='<p class="eyebrow">Missão '+(g.mission+1)+' · '+cnt+' de '+m+' cartas</p>';
+  if(!inTeam){
+    return obard(true)+'<section class="stack">'+head+'<h2>A missão está em andamento</h2><div class="teamline">Equipe: <b>'+oList(g.team)+'</b></div>'
+    +'<p class="lead">Você não está na equipe. Aguarde as cartas aparecerem.</p></section>';
+  }
+  if(done){
+    return obard(true)+'<section class="stack">'+head+'<h2>Carta enviada</h2><p class="lead">Aguardando o resto da equipe.</p></section>';
+  }
+  var warn=O.warn?'<p class="warn">Agentes Rebeldes só podem escolher Sucesso.</p>':'';
+  return obard(true)+'<section class="stack">'+head+'<h2>Como você age nesta missão?</h2>'
+  +'<p class="lead">Ninguém vê a sua escolha. As cartas são embaralhadas antes de aparecerem.</p></section>'
+  +'<div class="pair">'
+  +'<button class="btn big yes'+(O.pick==='S'?' sel':'')+'" data-a="oPickCard" data-v="S" aria-pressed="'+(O.pick==='S')+'">'+ICON_OK+'Sucesso</button>'
+  +'<button class="btn big no'+(O.pick==='F'?' sel':'')+'" data-a="oPickCard" data-v="F" aria-pressed="'+(O.pick==='F')+'">'+ICON_NO+'Fracasso</button></div>'
+  +warn+'<button class="btn primary" data-a="oConfirmCard"'+(O.pick?'':' disabled')+'>Confirmar carta</button>';
+}
+
+function oMissionResult(){
+  var g=O.game,m=g.mres,k=g.gid+'.r'+g.mission,up=(O.flipKey===k&&!O.flipRunning);
+  var faces=m.cards.map(function(c){
+    return '<div class="c3d'+(up?' up':'')+'"><div class="in">'+SL+'<div class="face back"></div><div class="face front '+c+'">'+(c==='S'?ICON_OK:ICON_NO)+'</div></div></div>';
+  }).join('');
+  var succ=m.cards.length-m.fails;
+  var sub=pl(succ,'carta de Sucesso','cartas de Sucesso')+' e '+pl(m.fails,'carta de Fracasso','cartas de Fracasso')+'.';
+  if(m.ok&&m.fails>0&&m.need===2)sub+=' Esta missão precisava de duas cartas de Fracasso, então ela passou.';
+  var title=m.ok?'Missão '+(g.mission+1)+' cumprida':'Missão '+(g.mission+1)+' fracassou';
+  var act=O.isHost?'<button class="btn primary" data-a="oContinue"'+(O.busy?' disabled':'')+'>Continuar</button>':'<p class="lead">Quem avança a partida é o operador.</p>';
+  return obard(true)+'<section class="stack"><p class="eyebrow">As cartas da equipe</p><div class="flips">'+faces+'</div></section>'
+  +'<section class="verdict '+(m.ok?'ok':'bad')+'" id="verdict"'+(up?'':' hidden')+'><h2>'+title+'</h2><p>'+sub+'</p>'+outCard(g.mission,m.ok)+act+'</section>';
+}
+
+function oAssassin(){
+  var g=O.game,head='<p class="eyebrow">Última chance dos infiltrados</p><h2>Os Rebeldes cumpriram três missões</h2>';
+  if(!O.myRole||O.myRole.special!=='assassino'){
+    return obard(false)+'<section class="stack">'+head+'<p class="lead">Os infiltrados conversam entre si. Em seguida, o Assassino aponta quem acha que é o Comandante.</p></section>';
+  }
+  var mine=O.intents[OL.id];
+  if(mine&&mine.phase==='assassin'&&mine.key===oKey(g)){
+    return obard(false)+'<section class="stack">'+head+'<p class="lead">Palpite enviado.</p></section>';
+  }
+  var btns=g.players.map(function(p,i){
+    var on=O.pick===p.id;
+    return '<button class="pbtn'+(on?' on':'')+'" data-a="oPickAssassin" data-i="'+i+'" aria-pressed="'+on+'"><span class="nm">'+esc(p.name)+'</span><span class="ck">'+ICON_SMALLCHECK+'</span></button>';
+  }).join('');
+  return obard(false)+'<section class="stack">'+head+'<p class="lead">Você é o Assassino. Converse com seus parceiros e aponte quem é o Comandante.</p></section>'
+  +'<div class="pgrid">'+btns+'</div>'
+  +'<button class="btn primary" data-a="oConfirmAssassin"'+(O.pick?'':' disabled')+'>Apontar o Comandante</button>';
+}
+
+function oEnd(){
+  var g=O.game,e=g.endInfo,res=e.winner==='res';
+  var rows=e.roles.map(function(r){
+    return '<div class="rrow '+r.team+'"><span class="nm">'+oN(r.id)+'</span><span class="rl">'+roleLabel(r)+'</span></div>';
+  }).join('');
+  var log=g.log.map(function(x){
+    var ap=[],rj=[];
+    Object.keys(x.votes).forEach(function(k){(x.votes[k]==='A'?ap:rj).push(k);});
+    var out='';
+    if(!x.ok)out='<span class="badt">Equipe rejeitada ('+x.ap+' × '+x.rj+')</span>';
+    else if(x.result)out='<span class="'+(x.result.ok?'okt':'badt')+'">'+(x.result.ok?'Missão cumprida':'Missão fracassou')+' · '+pl(x.result.succ,'sucesso','sucessos')+', '+pl(x.result.fail,'falha','falhas')+'</span>';
+    return '<li><strong>Missão '+(x.m+1)+' · líder '+oN(x.leader)+'</strong><span>Equipe: '+oList(x.team)+'</span>'
+      +'<span class="dim">Aprovaram: '+(ap.length?oList(ap):'ninguém')+'</span><span class="dim">Rejeitaram: '+(rj.length?oList(rj):'ninguém')+'</span>'+out+'</li>';
+  }).join('');
+  var act=O.isHost?'<button class="btn primary" data-a="oAgain"'+(O.busy?' disabled':'')+'>Jogar de novo com os mesmos jogadores</button>':'<p class="lead" style="text-align:center">O operador pode começar uma nova partida com todos.</p>';
+  return obard(false)
+  +'<section class="banner '+(res?'res':'spy')+'"><p class="eyebrow">Fim de jogo</p>'+EMB[res?'res':'spy']
+  +'<h1 style="font-size:clamp(24px,8vw,36px)">'+(res?'Os Rebeldes venceram':'Os infiltrados venceram')+'</h1><p>'+esc(e.reason)+'</p><p class="story-end">'+endStory(e.winner,g.results,e.reason)+'</p></section>'
+  +'<section class="stack"><h3>Quem era quem</h3><div class="roles">'+rows+'</div></section>'
+  +(log?'<section class="stack"><h3>Histórico da partida</h3><ul class="log">'+log+'</ul></section>':'')
+  +'<div class="actions">'+act+'</div>';
+}
+
+function runFlipOnline(){
+  var cards=[].slice.call(document.querySelectorAll('.c3d'));
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var finish=function(){if(!O)return;O.flipRunning=false;render();};
+  if(reduce||!cards.length){finish();return;}
+  cards.forEach(function(c,i){setTimeout(function(){c.classList.add('up');sfx('flip');},500+i*650);});
+  setTimeout(finish,500+cards.length*650+350);
+}
+function afterOnlineRender(){
+  if(!O||!O.game)return;
+  var g=O.game;
+  if(g.phase==='missionResult'&&g.mres){
+    var k=g.gid+'.r'+g.mission;
+    if(O.flipKey!==k){O.flipKey=k;O.flipRunning=true;runFlipOnline();}
+  }
+}
+
+/* ---------- ações ---------- */
+function endGame(winner,reason){G.endInfo={winner:winner,reason:reason};G.screen='end';}
+
+var A={
+  setMode:function(v){mode=(v==='online')?'online':'local';OL.msg='';},
+  createOnline:function(){
+    var nm=(OL.name||'').trim();
+    if(OL.busy||OL.status!=='ok')return;
+    if(!nm){OL.msg='Digite o seu codinome para criar a partida.';return;}
+    OL.msg='';createGame(nm);
+  },
+  joinOnline:function(){
+    var nm=(OL.name||'').trim();
+    if(OL.busy||OL.status!=='ok')return;
+    if(!nm){OL.msg='Digite o seu codinome para entrar na partida.';return;}
+    OL.msg='';joinGame(OL.code,nm,false);
+  },
+  oLeave:function(){leaveSession();},
+  oRole:function(){if(O&&O.myRole)O.showRole=!O.showRole;},
+  oHideRole:function(){if(O)O.showRole=false;},
+  oCopy:function(){
+    if(!O)return;
+    var code=O.code;O.copied=false;O.copyFail=false;
+    var ok=function(){if(O){O.copied=true;softRender();setTimeout(function(){if(O){O.copied=false;softRender();}},1800);}};
+    var bad=function(){if(O){O.copyFail=true;softRender();}};
+    try{navigator.clipboard.writeText(code).then(ok,bad);}catch(e){bad();}
+  },
+  oStart:function(){if(O&&O.isHost){pick.t0=Date.now();pick.sel=cfg.story;pick.online=true;pick.on=true;}},
+  oAgain:function(){if(O&&O.isHost)hostStart(O.game.players,O.game.assassin,O.game.story);},
+  oContinue:function(){hostContinue();},
+  oToggle:function(i){
+    var g=O.game,id=g.players[i].id,size=TEAMS[g.players.length][g.mission],k=O.sel.indexOf(id);
+    if(k>-1)O.sel.splice(k,1);else if(O.sel.length<size)O.sel.push(id);
+  },
+  oConfirmTeam:function(){
+    var g=O.game;
+    if(O.sel.length!==TEAMS[g.players.length][g.mission])return;
+    sendIntent({phase:'team',key:oKey(g),team:O.sel.slice()});
+  },
+  oPickVote:function(v){O.pick=v;},
+  oConfirmVote:function(){if(!O.pick)return;sendIntent({phase:'vote',key:oKey(O.game),vote:O.pick});},
+  oPickCard:function(v){
+    if(v==='F'&&O.myRole&&O.myRole.team==='res'){O.warn=true;O.pick=null;}
+    else{O.warn=false;O.pick=v;}
+  },
+  oConfirmCard:function(){if(!O.pick)return;sendCard(oKey(O.game),O.pick);},
+  oPickAssassin:function(i){O.pick=O.game.players[i].id;},
+  oConfirmAssassin:function(){if(!O.pick)return;sendIntent({phase:'assassin',key:oKey(O.game),pick:O.pick});},
+  openTour:function(){tour.on=true;tour.i=0;},
+  tourBack:function(){if(tour.i>0)tour.i--;},
+  tourNext:function(){if(tour.i>=TOUR.length-1){tour.on=false;markTourSeen();}else{tour.i++;}},
+  tourSkip:function(){tour.on=false;markTourSeen();},
+  dec:function(){if(cfg.n>5)cfg.n--;},
+  inc:function(){if(cfg.n<10)cfg.n++;},
+  pickSt:function(i){pick.sel=+i;},
+  storyBack:function(){pick.on=false;},
+  storyGo:function(){
+    cfg.story=pick.sel;try{localStorage.setItem('rd_story',String(cfg.story));}catch(e){}
+    pick.on=false;
+    if(pick.online){pick.online=false;if(O&&O.isHost&&!O.busy)hostStart(O.players,O.game.assassin,cfg.story);}
+    else introOpen(startGame,'Começar a partida');
+  },
+  splashGo:function(){SPL.on=false;sfx('unlock');},
+  start:function(){pick.t0=Date.now();pick.sel=cfg.story;pick.online=false;pick.on=true;},
+  openIntro:function(){introOpen(null,'Fechar');},
+  introNext:function(){if(intro.i>=INTRO.length-1)introEnd();else{intro.i++;}},
+  introSkip:function(){introEnd();},
+  showRole:function(){G.stage='show';},
+  nextRole:function(){G.idx++;if(G.idx>=cfg.n){G.screen='team';}else{G.stage='hand';}},
+  toggleP:function(i){
+    var size=TEAMS[cfg.n][G.mission],k=G.team.indexOf(i);
+    if(k>-1)G.team.splice(k,1);
+    else if(G.team.length<size)G.team.push(i);
+  },
+  confirmTeam:function(){
+    if(G.team.length!==TEAMS[cfg.n][G.mission])return;
+    G.order=[];for(var k=0;k<cfg.n;k++)G.order.push((G.leader+k)%cfg.n);
+    G.vi=0;G.vstage='hand';G.pick=null;G.votes={};G.screen='vote';
+  },
+  showVote:function(){G.vstage='choose';G.pick=null;},
+  pickVote:function(v){G.pick=v;},
+  confirmVote:function(){
+    if(!G.pick)return;
+    G.votes[G.order[G.vi]]=G.pick;G.pick=null;G.vi++;
+    if(G.vi>=cfg.n){
+      var ap=0;Object.keys(G.votes).forEach(function(k){if(G.votes[k]==='A')ap++;});
+      var rj=cfg.n-ap,ok=ap>rj;
+      G.log.push({m:G.mission,leader:G.leader,team:G.team.slice(),votes:JSON.parse(JSON.stringify(G.votes)),ap:ap,rj:rj,ok:ok,result:null});
+      G.vres={ap:ap,rj:rj,ok:ok};
+      if(!ok)G.rejects++;
+      G.screen='voteResult';
+    }else{G.vstage='hand';}
+  },
+  afterVote:function(){
+    if(G.vres.ok){
+      G.morder=G.order.filter(function(p){return G.team.indexOf(p)>-1;});
+      G.mi=0;G.mstage='hand';G.cards=[];G.pick=null;G.warn=false;G.screen='mission';
+    }else if(G.rejects>=5){
+      endGame('spy','Cinco equipes seguidas foram rejeitadas.');
+    }else{
+      G.leader=(G.leader+1)%cfg.n;G.team=[];G.screen='team';
+    }
+  },
+  showMission:function(){G.mstage='choose';G.pick=null;G.warn=false;},
+  pickCard:function(v){
+    var p=G.morder[G.mi];
+    if(v==='F'&&G.roles[p].team==='res'){G.warn=true;G.pick=null;}
+    else{G.warn=false;G.pick=v;}
+  },
+  confirmCard:function(){
+    if(!G.pick)return;
+    G.cards.push(G.pick);G.pick=null;G.warn=false;G.mi++;
+    if(G.mi>=G.morder.length){
+      var cards=shuffle(G.cards),fails=cards.filter(function(c){return c==='F';}).length;
+      var need=needFails(),ok=fails<need;
+      G.results[G.mission]=ok?'S':'F';
+      G.log[G.log.length-1].result={succ:cards.length-fails,fail:fails,ok:ok};
+      G.mres={cards:cards,fails:fails,ok:ok,need:need};
+      G.screen='missionResult';
+    }else{G.mstage='hand';}
+  },
+  afterMission:function(){
+    var s=G.results.filter(function(r){return r==='S';}).length;
+    var f=G.results.filter(function(r){return r==='F';}).length;
+    if(s>=3){
+      if(cfg.assassin){G.apick=null;G.screen='assassin';}
+      else endGame('res','Três missões foram cumpridas com sucesso.');
+    }else if(f>=3){
+      endGame('spy','Três missões fracassaram.');
+    }else{
+      G.mission++;G.rejects=0;G.leader=(G.leader+1)%cfg.n;G.team=[];G.screen='team';
+    }
+  },
+  pickAssassin:function(i){G.apick=i;},
+  confirmAssassin:function(){
+    if(G.apick===null)return;
+    var cmd=-1;G.roles.forEach(function(r,k){if(r.special==='comandante')cmd=k;});
+    if(G.apick===cmd)endGame('spy','O Assassino apontou '+G.names[cmd]+', e era mesmo o Comandante.');
+    else endGame('res','O Assassino apontou '+G.names[G.apick]+', mas o Comandante era '+G.names[cmd]+'.');
+  },
+  again:function(){startGame();},
+  toSetup:function(){G=null;}
+};
+
+var VIEWS={roles:rolesView,team:teamView,vote:voteView,voteResult:voteResultView,mission:missionView,missionResult:missionResultView,assassin:assassinView,end:endView};
+
+function runFlip(){
+  var cards=[].slice.call(document.querySelectorAll('.c3d'));
+  var verdict=document.getElementById('verdict');
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){cards.forEach(function(c){c.classList.add('up');});if(verdict)verdict.hidden=false;return;}
+  cards.forEach(function(c,i){setTimeout(function(){c.classList.add('up');sfx('flip');},500+i*650);});
+  setTimeout(function(){if(verdict)verdict.hidden=false;},500+cards.length*650+350);
+}
+
+var lastSig='';
+function sigNow(){
+  if(pick.on)return 'pick';
+  if(O)return O.game?('o|'+O.game.phase+'|'+oKey(O.game)+'|'+(O.showRole?1:0)):'o|conn';
+  if(tour.on)return 't'+tour.i;
+  if(!G)return 's'+mode;
+  return [G.screen,G.stage,G.idx,G.vstage,G.vi,G.mstage,G.mi,G.mission,G.rejects].join('|');
+}
+function render(){
+  useStory(O&&O.game?O.game.story:(G?G.story:cfg.story));
+  musSync();
+  if(SPL.on){
+    if(splDone)return;
+    app.innerHTML=splashView();splDone=true;window.scrollTo(0,0);return;
+  }
+  if(intro.on){
+    if(introDone===intro.i)return;
+    app.innerHTML=introView();introDone=intro.i;
+    window.scrollTo(0,0);
+    return;
+  }
+  var sig=sigNow(),changed=sig!==lastSig;
+  if(pick.on){app.innerHTML=storyView();svidSync();}
+  else if(O)app.innerHTML=onlineView();
+  else app.innerHTML=tour.on?tourView():(G?VIEWS[G.screen]():setupView());
+  if(changed)window.scrollTo(0,0);
+  lastSig=sig;
+  if(O)afterOnlineRender();
+  else if(G&&G.screen==='missionResult'&&changed)runFlip();
+}
+
+app.addEventListener('click',function(e){
+  var b=e.target.closest('[data-a]');
+  if(!b||b.disabled)return;
+  var f=A[b.dataset.a];
+  if(!f)return;
+  var arg=b.dataset.i!==undefined?+b.dataset.i:b.dataset.v;
+  f(arg);
+  render();
+  var da=b.dataset.a;
+  if(G&&!O&&!tour.on&&((da==='nextRole'&&G.screen==='roles'&&G.stage==='hand')||(da==='confirmVote'&&G.screen==='vote'&&G.vstage==='hand')||(da==='confirmCard'&&G.screen==='mission'&&G.mstage==='hand')))seal();
+});
+app.addEventListener('input',function(e){
+  var t=e.target;
+  if(!t.dataset)return;
+  if(t.dataset.name!==undefined)cfg.names[+t.dataset.name]=t.value;
+  else if(t.dataset.oname!==undefined)OL.name=t.value;
+  else if(t.dataset.ocode!==undefined)OL.code=t.value;
+});
+app.addEventListener('change',function(e){
+  if(e.target.id==='assassin')cfg.assassin=e.target.checked;
+  else if(e.target.id==='oassassin'&&O&&O.isHost&&O.game&&!O.busy){
+    var g=clone(O.game);g.assassin=e.target.checked;hostSet(g);
+  }
+});
+
+/* trilha de suspense: arquivo de áudio "Covert Meeting", em loop */
+var MUS={on:true,started:false,want:'lobby',cur:null,tr:{lobby:{src:'media/covert-meeting.mp3',audio:null,fade:null},match:{src:'media/covert-meeting-1.mp3',audio:null,fade:null}}};
+try{if(localStorage.getItem('rd_music')==='0')MUS.on=false;}catch(e){}
+var ICON_SND='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+var ICON_MUTE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
+function musUI(){
+  var b=document.getElementById('mus');if(!b)return;
+  b.innerHTML=MUS.on?ICON_SND:ICON_MUTE;
+  b.className=MUS.on?'':'off';
+  b.setAttribute('aria-pressed',MUS.on?'true':'false');
+  b.setAttribute('aria-label',MUS.on?'Desligar a música':'Ligar a música');
+}
+var MUS_VOL=.55;
+var MUS_XF=2200;
+function musFade(t,to,ms,done){
+  var a=t.audio;if(!a)return;
+  if(t.fade)clearInterval(t.fade);
+  var from=a.volume,steps=Math.max(1,Math.round(ms/50)),i=0;
+  t.fade=setInterval(function(){
+    i++;a.volume=Math.max(0,Math.min(1,from+(to-from)*i/steps));
+    if(i>=steps){clearInterval(t.fade);t.fade=null;if(done)done();}
+  },50);
+}
+function musTrack(name){
+  var t=MUS.tr[name];
+  if(!t.audio&&typeof Audio!=='undefined'){t.audio=new Audio(t.src);t.audio.loop=true;t.audio.preload='auto';t.audio.volume=0;}
+  return t;
+}
+/* entra a faixa pedida e sai a outra, as duas se cruzando */
+function musCross(name,ms){
+  var nt=musTrack(name);if(!nt.audio)return;
+  var prev=MUS.cur;MUS.cur=name;
+  var pr=nt.audio.play();if(pr&&pr.catch)pr.catch(function(){});
+  musFade(nt,MUS_VOL,ms);
+  Object.keys(MUS.tr).forEach(function(k){
+    if(k===name)return;
+    var ot=MUS.tr[k];if(!ot.audio)return;
+    musFade(ot,0,ms,function(){if(MUS.cur!==k)ot.audio.pause();});
+  });
+}
+function musPlay(){
+  if(typeof Audio==='undefined')return;
+  MUS.started=true;
+  musCross(MUS.want,1200);
+}
+function musStop(){
+  Object.keys(MUS.tr).forEach(function(k){
+    var t=MUS.tr[k];if(!t.audio)return;
+    musFade(t,0,900,function(){if(!MUS.on)t.audio.pause();});
+  });
+}
+/* a música da partida só entra quando a partida começa */
+function matchOn(){return !intro.on&&!pick.on&&!!((G&&G.screen)||(O&&O.game&&O.game.phase&&O.game.phase!=='lobby'));}
+function musSync(){
+  var w=matchOn()?'match':'lobby';
+  if(MUS.want===w)return;
+  MUS.want=w;
+  if(MUS.started&&MUS.on)musCross(w,MUS_XF);
+}
+var musBtn=document.getElementById('mus');
+if(musBtn){
+  musUI();
+  musBtn.addEventListener('click',function(){
+    MUS.on=!MUS.on;
+    try{localStorage.setItem('rd_music',MUS.on?'1':'0');}catch(e){}
+    musUI();
+    if(MUS.on)musPlay();else musStop();
+  });
+  var musFirst=function(e){
+    if(MUS.started||!MUS.on)return;
+    if(e&&e.target&&e.target.closest&&e.target.closest('#mus'))return;
+    musPlay();
+  };
+  window.addEventListener('pointerdown',musFirst);
+  window.addEventListener('keydown',musFirst);
+  document.addEventListener('visibilitychange',function(){
+    var t=MUS.cur&&MUS.tr[MUS.cur],a=t&&t.audio;if(!a||!MUS.on)return;
+    if(document.hidden)a.pause();else{var pr=a.play();if(pr&&pr.catch)pr.catch(function(){});}
+  });
+}
+
+
+/* tela de "sinal apagado" ao esconder um segredo antes de passar o aparelho */
+function seal(){
+  try{
+    var old=document.getElementById('seal');if(old&&old.parentNode)old.parentNode.removeChild(old);
+    var d=document.createElement('div');d.id='seal';d.setAttribute('aria-hidden','true');
+    d.innerHTML=ICON_LOCK+'<b>SINAL APAGADO</b><small>Passe o aparelho</small>';
+    document.body.appendChild(d);
+    sfx('seal');
+    setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d);},960);
+  }catch(e){}
+}
+/* vibração (Android; o iPhone não permite) */
+var VIB={tap:6,yes:12,no:[25,30,25],inc:8,dec:8,pick:8,flip:10,ok:[40,60,40,60,90],bad:[150,60,150,60,300],win:[60,50,60,50,60,50,250],lose:[400,100,200],seal:45,unlock:[15,40,25],armOn:[20,40,50],armOff:15,local:15,online:[20,40,20]};
+
+/* efeitos sonoros sintetizados (independentes do botão de música) */
+var SFXC=null;
+function sfxCtx(){
+  if(SFXC)return SFXC;
+  try{var C=window.AudioContext||window.webkitAudioContext;if(C)SFXC=new C();}catch(e){}
+  return SFXC;
+}
+function sfxTone(c,t,f,d,type,vol,f2){
+  var o=c.createOscillator(),g=c.createGain();
+  o.type=type||'sine';o.frequency.setValueAtTime(f,t);
+  if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);
+  g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(vol,t+0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+  o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+0.02);
+}
+function sfxNoise(c,t,d,vol,fq){
+  var n=Math.floor(c.sampleRate*d),b=c.createBuffer(1,n,c.sampleRate),a=b.getChannelData(0);
+  for(var i=0;i<n;i++)a[i]=(Math.random()*2-1)*(1-i/n);
+  var s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();
+  s.buffer=b;f.type='bandpass';f.frequency.value=fq||1800;g.gain.value=vol;
+  s.connect(f);f.connect(g);g.connect(c.destination);s.start(t);
+}
+function sfx(k){
+  try{if(VIB[k]&&navigator.vibrate)navigator.vibrate(VIB[k]);}catch(e){}
+  var c=sfxCtx();if(!c)return;
+  try{
+    if(c.state==='suspended')c.resume();
+    var t=c.currentTime+0.01,i;
+    if(k==='tap'){sfxTone(c,t,1300,0.05,'square',0.05,900);}
+    else if(k==='yes'){sfxTone(c,t,660,0.09,'triangle',0.12);sfxTone(c,t+0.07,990,0.16,'triangle',0.12);}
+    else if(k==='no'){sfxTone(c,t,200,0.2,'sawtooth',0.09,90);sfxNoise(c,t,0.12,0.08,700);}
+    else if(k==='armOn'){sfxTone(c,t,180,0.12,'square',0.06);sfxTone(c,t+0.1,360,0.1,'square',0.06);sfxTone(c,t+0.2,1100,0.25,'triangle',0.1);sfxNoise(c,t+0.2,0.08,0.05,3000);}
+    else if(k==='armOff'){sfxTone(c,t,900,0.1,'triangle',0.08,500);sfxTone(c,t+0.09,300,0.18,'square',0.05,150);}
+    else if(k==='seal'){sfxNoise(c,t,0.05,0.12,2500);sfxTone(c,t+0.04,140,0.25,'sine',0.2,70);sfxTone(c,t+0.3,300,0.05,'square',0.05);}
+    else if(k==='unlock'){sfxNoise(c,t,0.04,0.08,3500);sfxTone(c,t+0.05,600,0.06,'square',0.05);sfxTone(c,t+0.12,900,0.1,'square',0.05);}
+    else if(k==='inc'){sfxTone(c,t,520,0.06,'square',0.05);sfxTone(c,t+0.05,780,0.09,'square',0.05);}
+    else if(k==='dec'){sfxTone(c,t,780,0.06,'square',0.05);sfxTone(c,t+0.05,520,0.09,'square',0.05);}
+    else if(k==='pick'){sfxTone(c,t,880,0.05,'triangle',0.09);}
+    else if(k==='local'){sfxTone(c,t,300,0.08,'square',0.05);sfxTone(c,t+0.07,450,0.1,'square',0.05);sfxNoise(c,t,0.06,0.04,2500);}
+    else if(k==='online'){sfxTone(c,t,400,0.35,'sine',0.11,1500);sfxTone(c,t+0.28,1500,0.5,'sine',0.07);sfxTone(c,t+0.28,1503,0.5,'sine',0.05);sfxNoise(c,t,0.25,0.04,3500);}
+    else if(k==='flip'){sfxNoise(c,t,0.06,0.07,3000);sfxTone(c,t,520,0.07,'sine',0.07,260);}
+    else if(k==='ok'){[523,659,784,1047].forEach(function(f,j){sfxTone(c,t+j*0.1,f,0.5,'triangle',0.13);sfxTone(c,t+j*0.1,f*2,0.3,'sine',0.04);});}
+    else if(k==='bad'){sfxNoise(c,t,0.35,0.2,900);sfxTone(c,t,220,0.5,'sawtooth',0.12,70);sfxTone(c,t+0.05,233,0.5,'square',0.06,65);sfxTone(c,t+0.35,110,0.6,'sine',0.14,55);}
+    else if(k==='win'){[392,523,659,784,1047].forEach(function(f,j){sfxTone(c,t+j*0.13,f,0.9,'triangle',0.13);});sfxTone(c,t+0.7,523,1.6,'sine',0.1);sfxTone(c,t+0.7,784,1.6,'sine',0.08);sfxTone(c,t+0.7,1047,1.6,'sine',0.06);}
+    else if(k==='lose'){for(i=0;i<4;i++)sfxTone(c,t+i*0.04,196*Math.pow(1.06,i),1.4,'sawtooth',0.05,60);sfxNoise(c,t,0.5,0.2,600);sfxTone(c,t+0.5,98,1.6,'sine',0.16,41);}
+  }catch(e){}
+}
+if(document.addEventListener){
+  document.addEventListener('pointerdown',function(e){
+    var b=e.target&&e.target.closest?e.target.closest('.btn,.big,.stepper button,.tab,.pbtn,.scard'):null;
+    if(!b||b.disabled)return;
+    if(b.dataset&&(b.dataset.a==='showRole'||b.dataset.a==='showVote'||b.dataset.a==='showMission')){sfx('unlock');return;}
+    if(b.id==='inc'){sfx('inc');return;}
+    if(b.id==='dec'){sfx('dec');return;}
+    if(b.classList.contains('tab')){if(!b.classList.contains('on'))sfx(b.dataset.v==='online'?'online':'local');return;}
+    if(b.classList.contains('pbtn')||b.classList.contains('scard')){sfx('pick');return;}
+    sfx(b.classList.contains('big')?(b.classList.contains('no')?'no':'yes'):'tap');
+  },true);
+  document.addEventListener('change',function(e){
+    var t=e.target;if(!t||(t.id!=='assassin'&&t.id!=='oassassin'))return;
+    sfx(t.checked?'armOn':'armOff');
+  },true);
+  document.addEventListener('animationstart',function(e){
+    var el=e.target;if(!el||!el.closest||e.animationName!=='stamp')return;
+    var v=el.closest('.verdict'),bn=el.closest('.banner');
+    if(v)sfx(v.classList.contains('ok')?'ok':'bad');
+    else if(bn)sfx(bn.classList.contains('res')?'win':'lose');
+  },true);
+}
+
+/* inclinação 3D que segue o dedo ou o mouse */
+function tiltTarget(e){return e.target&&e.target.closest?e.target.closest('.role,.banner'):null;}
+function tiltMove(e){
+  var el=tiltTarget(e);if(!el)return;
+  var r=el.getBoundingClientRect();if(!r.width||!r.height)return;
+  var px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;
+  el.style.setProperty('--ry',((px-.5)*16).toFixed(1)+'deg');
+  el.style.setProperty('--rx',((.5-py)*16).toFixed(1)+'deg');
+  el.style.setProperty('--gx',(px*100).toFixed(0)+'%');
+  el.style.setProperty('--gy',(py*100).toFixed(0)+'%');
+}
+function tiltReset(e){
+  var el=tiltTarget(e);if(!el)return;
+  ['--rx','--ry','--gx','--gy'].forEach(function(k){el.style.removeProperty(k);});
+}
+app.addEventListener('pointermove',tiltMove);
+app.addEventListener('pointerdown',tiltMove);
+app.addEventListener('pointerup',tiltReset);
+app.addEventListener('pointerleave',tiltReset);
+app.addEventListener('pointercancel',tiltReset);
+
+/* ondulação ao tocar nos botões */
+if(document.addEventListener)document.addEventListener('pointerdown',function(e){
+  var b=e.target&&e.target.closest?e.target.closest('.btn,.big'):null;
+  if(!b||b.disabled)return;
+  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  var r=b.getBoundingClientRect(),d=document.createElement('span');
+  d.className='rip';d.style.left=(e.clientX-r.left)+'px';d.style.top=(e.clientY-r.top)+'px';
+  b.appendChild(d);setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d);},650);
+},true);
+
+/* vídeo da caixinha: roda no hover (mouse) ou quando a história está escolhida (celular) */
+function svidSet(v,on){
+  if(!v)return;
+  if(on){v.classList.add('live');var pr=v.play();if(pr&&pr.catch)pr.catch(function(){});}
+  else{v.classList.remove('live');try{v.pause();}catch(e){}}
+}
+function svidSync(){
+  var vs=document.querySelectorAll?document.querySelectorAll('.svid'):[];
+  for(var i=0;i<vs.length;i++){var c=vs[i].closest('.scard');svidSet(vs[i],!!(c&&c.classList.contains('on')));}
+}
+if(document.addEventListener){
+  document.addEventListener('mouseover',function(e){var c=e.target&&e.target.closest?e.target.closest('.scard'):null;if(c)svidSet(c.querySelector('.svid'),true);});
+  document.addEventListener('mouseout',function(e){var c=e.target&&e.target.closest?e.target.closest('.scard'):null;if(c&&!c.classList.contains('on')&&!(e.relatedTarget&&c.contains(e.relatedTarget)))svidSet(c.querySelector('.svid'),false);});
+}
+
+render();
+initOnline().then(afterInit);
+})();
+</script>
+</body>
+</html>
